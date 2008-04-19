@@ -5,7 +5,7 @@ RDF::Trine::Store::DBI - [One line description of module's purpose here]
 
 =head1 VERSION
 
-This document describes RDF::Trine::Store::DBI version 0.002
+This document describes RDF::Trine::Store::DBI version 0.106
 
 
 =head1 SYNOPSIS
@@ -57,7 +57,9 @@ use RDF::Trine::Statement;
 use RDF::Trine::Statement::Quad;
 use RDF::Trine::Iterator;
 
-our $VERSION	= "0.003";
+use RDF::Trine::Store::DBI::mysql;
+
+our $VERSION	= "0.106";
 use constant DEBUG	=> 0;
 our $debug		= DEBUG;
 
@@ -95,6 +97,9 @@ sub new {
 		my $dsn		= shift;
 		my $user	= shift;
 		my $pass	= shift;
+# 		if ($dsn =~ /^DBI:mysql:/) {
+# 			$class	= 'RDF::Trine::Store::DBI::mysql';
+# 		}
 		warn "Connecting to $dsn ($user, $pass)" if (DEBUG);
 		$dbh		= DBI->connect( $dsn, $user, $pass );
 	}
@@ -142,8 +147,8 @@ sub get_statements {
 	my @vars	= $triple->referenced_variables;
 	
 	local($self->{context_variable_count})	= 0;
+	local($self->{join_context_nodes})		= 1 if (blessed($context) and $context->is_variable);
 	my $sql		= $self->_sql_for_pattern( $triple, $context, @_ );
-#	warn $sql;
 	my $sth		= $dbh->prepare( $sql );
 	$sth->execute();
 	
@@ -292,7 +297,6 @@ sub add_statement {
 	my $self	= shift;
 	my $stmt	= shift;
 	my $context	= shift;
-	
 	my $dbh		= $self->dbh;
 # 	Carp::confess unless (blessed($stmt));
 	my $stable	= $self->statements_table;
@@ -758,7 +762,7 @@ sub _sql_for_triple {
 	unless ($quad) {
 		if (defined($ctx)) {
 			$self->_add_sql_node_clause( "${table}.Context", $ctx, $context );
-		} else {
+		} elsif ($self->{join_context_nodes}) {
 			$self->_add_sql_node_clause( "${table}.Context", RDF::Trine::Node::Variable->new( 'sql_ctx_' . ++$self->{ context_variable_count } ), $context );
 		}
 	}

@@ -7,6 +7,8 @@ use inc::Module::Install;
 
 license				'perl';
 
+recommends			'XML::SAX::Expat::Incremental'	=> 0;
+
 build_requires		'Test::JSON'				=> 0;
 build_requires		'Test::More'				=> 0.61;
 build_requires		'Test::Exception'			=> 0;
@@ -17,7 +19,6 @@ WriteMakefile(
     ABSTRACT_FROM		=> 'lib/RDF/Trine.pm',
 	AUTHOR				=> 'Gregory Todd Williams <gwilliams@cpan.org>',
     PREREQ_PM			=> {
-					'Bloom::Filter'				=> 0,
 					'Data::UUID'				=> 0,
 					'DBI'						=> 0,
 					'DBD::SQLite'				=> 1.14,
@@ -29,10 +30,11 @@ WriteMakefile(
 					'List::Util'				=> 0,
 					'Math::BigInt'				=> 0,
 					'Scalar::Util'				=> 0,
+					'Time::HiRes'				=> 0,
 					'Unicode::Escape'			=> 0,
 					'URI'						=> 0,
 					'XML::CommonNS'				=> 0.04,
 					'XML::Namespace'			=> 0,
-					'XML::Twig'					=> 0,
+					'XML::SAX'					=> 0,
 				},
 );

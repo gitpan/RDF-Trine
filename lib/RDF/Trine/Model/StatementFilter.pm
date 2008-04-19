@@ -1,7 +1,4 @@
 # RDF::Trine::Model::StatementFilter
-# -------------
-# $Revision: 121 $
-# $Date: 2006-02-06 23:07:43 -0500 (Mon, 06 Feb 2006) $
 # -----------------------------------------------------------------------------
 
 =head1 NAME
@@ -28,9 +25,10 @@ use RDF::Trine::Pattern;
 use RDF::Trine::Store::DBI;
 use RDF::Trine::Iterator qw(sgrep);
 
-our $debug;
+our ($debug, $VERSION);
 BEGIN {
-	$debug	= 0;
+	$debug		= 0;
+	$VERSION	= '0.106';
 }
 
 ################################################################################
@@ -120,16 +118,17 @@ sub get_pattern {
 		
 		my @streams;
 		foreach my $triple (@triples) {
+			my @vars	= map { $_->name } grep { $_->isa('RDF::Trine::Node::Variable') } $triple->nodes;
 			Carp::confess "not a statement object: " . Dumper($triple) unless ($triple->isa('RDF::Trine::Statement'));
 			my $stream	= $self->get_statements( $triple->nodes, $context );
-			my $binds	= $stream->as_bindings( $triple->nodes );
+			my $binds	= $stream->as_bindings( $triple->nodes )->project( @vars );
 			push(@streams, $binds);
 		}
 		if (@streams) {
 			while (@streams > 1) {
 				my $a	= shift(@streams);
 				my $b	= shift(@streams);
-				unshift(@streams, RDF::Trine::Iterator->join_streams( $a, $b ));
+				unshift(@streams, RDF::Trine::Iterator::Bindings->join_streams( $a, $b ));
 			}
 		} else {
 			push(@streams, RDF::Trine::Iterator::Bindings->new([{}], []));
