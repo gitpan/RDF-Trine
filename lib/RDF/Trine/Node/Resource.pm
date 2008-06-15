@@ -61,7 +61,6 @@ sub new {
 		### the URI into an absolute URI, and then replace the breadcrumbs with
 		### the Unicode.
 		
-		
 		my $abs			= URI->new_abs( $uri, $base->uri_value );
 		$uri			= $abs->as_string;
 	}
@@ -124,15 +123,23 @@ sub sse {
 				return $qname;
 			}
 		}
-		my $string	= qq(<${uri}>);
+		
+		my $qname	= 0;
+		my $string	= qq(${uri});
 		foreach my $n (keys %$ns) {
 			if (substr($uri, 0, length($ns->{ $n })) eq $ns->{ $n }) {
 				$string	= join(':', $n, substr($uri, length($ns->{ $n })));
+				$qname	= 1;
 				last;
 			}
 		}
 		
-		return $string;
+		my $escaped	= $self->_unicode_escape( $string );
+		if ($qname) {
+			return $escaped;
+		} else {
+			return '<' . $escaped . '>';
+		}
 	}
 }
 

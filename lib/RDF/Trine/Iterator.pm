@@ -38,6 +38,7 @@ use Scalar::Util qw(blessed reftype refaddr);
 
 use XML::SAX;
 use RDF::Trine::Node;
+use RDF::Trine::Promise;
 use RDF::Trine::Iterator::SAXHandler;
 
 our ($VERSION, $debug, @ISA, @EXPORT_OK);
@@ -83,7 +84,7 @@ sub new {
 	my $names		= shift || [];
 	my %args		= @_;
 	
-	if (ref($stream) and reftype($stream) eq 'ARRAY') {
+	if (ref($stream) and ref($stream) eq 'ARRAY') {
 		my $array	= $stream;
 		$stream	= sub {
 			return shift(@$array);
@@ -102,6 +103,7 @@ sub new {
 		_stream		=> $stream,
 		_args		=> \%args,
 		_row		=> undef,
+		_peek		=> [],
 #		_source		=> Carp::longmess(),
 	};
 	
@@ -197,6 +199,7 @@ sub from_handle_incremental {
 	my $class		= shift;
 	my $handle		= shift;
 	my $chunk_size	= shift || 1024;
+	my $prelude		= shift || '';
 	
 	eval "
 		require XML::SAX::Expat;
@@ -209,10 +212,22 @@ sub from_handle_incremental {
 	my $handler	= RDF::Trine::Iterator::SAXHandler->new();
 	my $p	= XML::SAX::Expat::Incremental->new( Handler => $handler );
 	$p->parse_start;
+
+	my $dfh;
+	if ($debug) {
+		open( $dfh, '>>', sprintf('/tmp/recv-%d.xml', ++$::COUNT) ) or die $!;
+		print {$dfh} "########################################################\n";
+	}
+	
+	if (length($prelude)) {
+		print {$dfh} $prelude if ($debug);
+		$p->parse_more( $prelude );
+	}
 	
 	until ($handler->has_head) {
 		my $buffer;
-		$handle->recv($buffer, $chunk_size);
+		$handle->sysread($buffer, $chunk_size);
+		print {$dfh} $buffer if ($debug);
 		if (my $size = length($buffer)) {
 			warn "read $size bytes\n" if ($debug);
 			$p->parse_more( $buffer );
@@ -233,7 +248,8 @@ sub from_handle_incremental {
 		my $data;
 		while (not($handler->has_end) and not($data = $handler->pull_result)) {
 			my $buffer;
-			$handle->recv($buffer, $chunk_size);
+			$handle->sysread($buffer, $chunk_size);
+			print {$dfh} $buffer if ($debug);
 			if (my $size = length($buffer)) {
 				warn "read $size bytes\n" if ($debug);
 				$p->parse_more( $buffer );
@@ -266,7 +282,14 @@ sub next {
 	my $self	= shift;
 	return if ($self->{_finished});
 	
+	if (scalar(@{ $self->{_peek} })) {
+		return shift(@{ $self->{_peek} });
+	}
+	
 	my $stream	= $self->{_stream};
+	if (blessed($stream) and $stream->isa('RDF::Trine::Promise')) {
+		$stream	= $self->{_stream}	= $stream->value;
+	}
 	my $value	= $stream->();
 	unless (defined($value)) {
 		$self->{_finished}	= 1;
@@ -277,6 +300,21 @@ sub next {
 	return $value;
 }
 
+=item C<< peek >>
+
+Returns the next value from the iterator without consuming it. The value will
+remain in queue until the next call to C<< next >>.
+
+=cut
+
+sub peek {
+	my $self	= shift;
+	return if ($self->{_finished});
+	
+	my $value	= $self->next;
+	push( @{ $self->{_peek} }, $value );
+	return $value;
+}
 
 =item C<< current >>
 
@@ -476,25 +514,6 @@ sub _row {
 	return $self->{_row};
 }
 
-# =item C<< bridge >>
-# 
-# Returns the model bridge object used for insepcting the objects returned by the stream.
-# 
-# =cut
-# 
-# sub bridge {
-# 	my $self	= shift;
-# 	if (@_) {
-# 		$self->_args->{bridge}	= shift;
-# 	}
-# 	return $self->_args->{bridge};
-# }
-# 
-# sub _bridge {
-# 	my $self	= shift;
-# 	return $self->bridge;
-# }
-
 sub _names {
 	my $self	= shift;
 	return $self->{_names};
@@ -523,6 +542,7 @@ sub add_extra_result_data {
 
 sub extra_result_data {
 	my $self	= shift;
+	$self->peek;
 	my $args	= $self->_args;
 	my $extra	= $args->{ extra_result_data };
 	return $extra;
