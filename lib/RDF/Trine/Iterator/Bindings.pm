@@ -29,6 +29,7 @@ no warnings 'redefine';
 use Data::Dumper;
 
 use JSON 2.0;
+use Text::Table;
 use Scalar::Util qw(reftype);
 use List::MoreUtils qw(uniq);
 use RDF::Trine::Iterator::Bindings::Materialized;
@@ -39,7 +40,7 @@ use base qw(RDF::Trine::Iterator);
 our ($VERSION, $debug);
 BEGIN {
 	$debug		= 0;
-	$VERSION	= 0.107;
+	$VERSION	= 0.108;
 }
 
 =item C<new ( \@results, \@names, %args )>
@@ -314,21 +315,6 @@ sub nested_loop_join {
 }
 
 
-=item C<< next_result >>
-
-Returns the next binding result.
-
-=cut
-
-sub next_result {
-	my $self	= shift;
-	my $data	= $self->SUPER::next_result();
-	if (defined($data)) {
-		Carp::confess "not a HASH ref" unless (reftype($data) eq 'HASH');
-	}
-	return $data;
-}
-
 =item C<< sorted_by >>
 
 =cut
@@ -418,10 +404,8 @@ Returns the number of variable bindings in the current result.
 sub bindings_count {
 	my $self	= shift;
 	my $names	= $self->{_names};
-	my $row		= ($self->open) ? $self->current : $self->next;
 	return scalar( @$names ) if (scalar(@$names));
-	return 0 unless ref($row);
-	return scalar( @{ [ keys %$row ] } );
+	return 0;
 }
 
 =item C<is_bindings>
@@ -496,6 +480,40 @@ sub as_xml {
 	return $string;
 }
 
+=item C<as_string ( $max_size )>
+
+Returns a string table serialization of the stream data.
+
+=cut
+
+sub as_string {
+	my $self			= shift;
+	my $max_result_size	= shift || 0;
+	my @names			= $self->binding_names;
+	my $headers			= \@names;
+	my $rows			= [ map { [ @{$_}{ @names } ] } $self->get_all ];
+
+	my @rule			= qw(- +);
+	my @headers			= \'| ';
+	push @headers => map { $_ => \' | ' } @$headers;
+	pop	@headers;
+	push @headers => (\" |");
+
+	unless ('ARRAY' eq ref $rows && 'ARRAY' eq ref $rows->[0] && @$headers == @{ $rows->[0] }) {
+		die("make_table() rows must be an AoA with rows being same size as headers");
+	}
+	my $table = Text::Table->new(@headers);
+	$table->rule(@rule);
+	$table->body_rule(@rule);
+	$table->load(@$rows);
+
+	return $table->rule(@rule),
+			$table->title,
+			$table->rule(@rule),
+			map({ $table->body($_) } 0 .. @$rows),
+			$table->rule(@rule);
+}
+
 =item C<< print_xml ( $fh, $max_size ) >>
 
 Prints an XML serialization of the stream data to the filehandle $fh.
@@ -521,7 +539,7 @@ sub print_xml {
 <head>
 END
 	
-	my $t	= join("\n\t", map { qq(<variable name="$_"/>) } @variables);
+	my $t	= join("\n", map { qq(\t<variable name="$_"/>) } @variables);
 	
 	my $delay_output	= 0;
 	my $delayed			= '';
@@ -540,12 +558,12 @@ END
 END
 	
 	my $count	= 0;
-	while (!$self->finished) {
+	while (my $row = $self->next) {
 		my @row;
 		print {$fh} "\t\t<result>\n";
 		for (my $i = 0; $i < $width; $i++) {
 			my $name	= $self->binding_name($i);
-			my $value	= $self->binding_value($i);
+			my $value	= $row->{ $name };
 			print {$fh} "\t\t\t" . $self->format_node_xml($value, $name) . "\n";
 		}
 		print {$fh} "\t\t</result>\n";

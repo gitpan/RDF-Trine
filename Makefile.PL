@@ -31,12 +31,14 @@ WriteMakefile(
 					'List::Util'				=> 0,
 					'Math::BigInt'				=> 0,
 					'Scalar::Util'				=> 0,
+					'Text::Table'				=> 0,
 					'Time::HiRes'				=> 0,
 					'Unicode::Escape'			=> 0,
 					'URI'						=> 0,
 					'XML::CommonNS'				=> 0.04,
 					'XML::Namespace'			=> 0,
 					'XML::SAX'					=> 0,
+					'XML::SAX::Expat'			=> 0,	# we shouldn't need this, but XML::SAX::PurePerl seems to have some major bugs with unicode in some of the RDF/XML syntax examples
 					'XML::Parser'				=> 0,
 				},
 );
