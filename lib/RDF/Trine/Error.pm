@@ -35,9 +35,8 @@ use base qw(Error);
 
 ######################################################################
 
-our ($VERSION, $debug);
+our ($VERSION);
 BEGIN {
-	$debug		= 0;
 	$VERSION	= 0.108;
 }
 
@@ -56,6 +55,10 @@ package RDF::Trine::Error::MethodInvocationError;
 use base qw(RDF::Trine::Error);
 
 package RDF::Trine::Error::SerializationError;
+
+use base qw(RDF::Trine::Error);
+
+package RDF::Trine::Error::DatabaseError;
 
 use base qw(RDF::Trine::Error);
 

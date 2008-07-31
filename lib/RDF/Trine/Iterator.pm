@@ -33,6 +33,7 @@ no warnings 'redefine';
 
 use JSON;
 use Data::Dumper;
+use Log::Log4perl;
 use Carp qw(carp);
 use Scalar::Util qw(blessed reftype refaddr);
 
@@ -41,15 +42,13 @@ use RDF::Trine::Node;
 use RDF::Trine::Promise;
 use RDF::Trine::Iterator::SAXHandler;
 
-our ($VERSION, $debug, @ISA, @EXPORT_OK);
-use constant DEBUG	=> 0;
+our ($VERSION, @ISA, @EXPORT_OK);
 BEGIN {
-	$debug		= DEBUG;
 	$VERSION	= 0.108;
 	
 	require Exporter;
 	@ISA		= qw(Exporter);
-	@EXPORT_OK	= qw(sgrep smap swatch);
+	@EXPORT_OK	= qw(sgrep smap swatch sfinally);
 	use overload 'bool' => sub { $_[0] };
 	use overload '&{}' => sub {
 		my $self	= shift;
@@ -213,35 +212,31 @@ sub from_handle_incremental {
 	my $p	= XML::SAX::Expat::Incremental->new( Handler => $handler );
 	$p->parse_start;
 
-	my $dfh;
-	if ($debug) {
-		open( $dfh, '>>', sprintf('/tmp/recv-%d.xml', ++$::COUNT) ) or die $!;
-		print {$dfh} "########################################################\n";
-	}
+	my $l		= Log::Log4perl->get_logger("rdf.trine.iterator");
 	
 	if (length($prelude)) {
-		print {$dfh} $prelude if ($debug);
+		$l->debug($prelude);
 		$p->parse_more( $prelude );
 	}
 	
 	until ($handler->has_head) {
 		my $buffer;
 		$handle->sysread($buffer, $chunk_size);
-		print {$dfh} $buffer if ($debug);
+		$l->debug($buffer);
 		if (my $size = length($buffer)) {
-			warn "read $size bytes\n" if ($debug);
+			$l->debug("read $size bytes");
 			$p->parse_more( $buffer );
 		} else {
-			warn "read 0 bytes\n" if ($debug);
+			$l->debug("read 0 bytes");
 			if ($handle->eof) {
-				warn "-> handle is at eof\n" if ($debug);
+				$l->debug("-> handle is at eof");
 				return undef;
 			}
 			select( undef, undef, undef, 0.25 );
 		}
 	}
 	
-	warn "iterator has head. now returning an iterative stream." if ($debug);
+	$l->debug("iterator has head. now returning an iterative stream.");
 	
 	my @args	= $handler->iterator_args;
 	my $iter	= sub {
@@ -249,14 +244,14 @@ sub from_handle_incremental {
 		while (not($handler->has_end) and not($data = $handler->pull_result)) {
 			my $buffer;
 			$handle->sysread($buffer, $chunk_size);
-			print {$dfh} $buffer if ($debug);
+			$l->debug($buffer);
 			if (my $size = length($buffer)) {
-				warn "read $size bytes\n" if ($debug);
+				$l->debug("read $size bytes");
 				$p->parse_more( $buffer );
 			} else {
-				warn "read 0 bytes\n" if ($debug);
+				$l->debug("read 0 bytes");
 				if ($handle->eof) {
-					warn "-> handle is at eof\n" if ($debug);
+					$l->debug("-> handle is at eof");
 					return undef;
 				}
 				select( undef, undef, undef, 0.25 );
@@ -663,6 +658,37 @@ sub swatch (&$) {
 		
 		local($_)	= $data;
 		$block->( $data );
+		return $data;
+	};
+	
+	my $s		= $stream->_new( $next, @args );
+	return $s;
+}
+
+=item C<sfinally { EXPR } $stream>
+
+=cut
+
+sub sfinally (&$) {
+	my $block	= shift;
+	my $stream	= shift;
+	my @args	= $stream->construct_args();
+	my $class	= ref($stream);
+	
+	my $open	= 1;
+	my $next	= sub {
+		return undef unless ($open);
+		if (@_ and $_[0]) {
+			$block->();
+			$stream->close;
+			$open	= 0;
+		}
+		my $data	= $stream->next;
+		unless ($data) {
+			$block->();
+			$open	= 0;
+			return undef;
+		}
 		return $data;
 	};
 	
