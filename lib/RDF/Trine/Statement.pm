@@ -151,6 +151,34 @@ sub sse {
 	);
 }
 
+=item C<< from_sse ( $string, $context ) >>
+
+Parses the supplied SSE-encoded string and returns a RDF::Trine::Statement object.
+
+=cut
+
+sub from_sse {
+	my $class	= shift;
+	my $context	= $_[1];
+	for ($_[0]) {
+		if (m/^[(]triple/) {
+			s/^[(]triple\s+//;
+			my @nodes;
+			push(@nodes, RDF::Trine::Node->from_sse( $_, $context ));
+			push(@nodes, RDF::Trine::Node->from_sse( $_, $context ));
+			push(@nodes, RDF::Trine::Node->from_sse( $_, $context ));
+			if (m/^\s*[)]/) {
+				s/^\s*[)]//;
+				return RDF::Trine::Statement->new( @nodes );
+			} else {
+				throw RDF::Trine::Error -text => "Cannot parse end-of-triple from SSE string: >>$_<<";
+			}
+		} else {
+			throw RDF::Trine::Error -text => "Cannot parse triple from SSE string: >>$_<<";
+		}
+	}
+}
+
 =item C<< type >>
 
 Returns the type of this algebra expression.

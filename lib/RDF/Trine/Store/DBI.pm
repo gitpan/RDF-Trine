@@ -58,6 +58,7 @@ use Log::Log4perl;
 
 use RDF::Trine::Error;
 use RDF::Trine::Store::DBI::mysql;
+use RDF::Trine::Store::DBI::SQLite;
 use RDF::Trine::Store::DBI::Pg;
 
 our $VERSION	= "0.108";
@@ -89,6 +90,7 @@ sub new {
 		$l->trace("trying to construct a temporary model");
 		my $dsn		= "dbi:SQLite:dbname=:memory:";
 		$dbh		= DBI->connect( $dsn, '', '' );
+		$class		= 'RDF::Trine::Store::DBI::SQLite';
 	} elsif (blessed($_[0]) and $_[0]->isa('DBI::db')) {
 		$l->trace("got a DBD handle");
 		$dbh		= shift;
@@ -100,6 +102,8 @@ sub new {
 			$class	= 'RDF::Trine::Store::DBI::mysql';
 		} elsif ($dsn =~ /^DBI:Pg:/) {
 			$class	= 'RDF::Trine::Store::DBI::Pg';
+		} elsif ($dsn =~ /^DBI:SQLite:/) {
+			$class	= 'RDF::Trine::Store::DBI::SQLite';
 		}
 		$l->trace("Connecting to $dsn ($user, $pass)");
 		$dbh		= DBI->connect( $dsn, $user, $pass );
@@ -182,7 +186,7 @@ sub get_statements {
 			}
 		}
 		if (blessed($context) and $context->is_variable) {
-			my $nodename	= 'sql_ctx_1_';
+			my $nodename	= $context->name; #'sql_ctx_1_';
 			my $uri			= $self->_column_name( $nodename, 'URI' );
 			my $name		= $self->_column_name( $nodename, 'Name' );
 			my $value		= $self->_column_name( $nodename, 'Value' );
@@ -193,11 +197,11 @@ sub get_statements {
 			} elsif (defined $row->{ $value }) {
 				my @cols	= map { $self->_column_name( $nodename, $_ ) } qw(Value Language Datatype);
 				push( @triple, RDF::Trine::Node::Literal->new( @{ $row }{ @cols } ) );
+			} else {
 			}
 		} elsif ($context) {
 			push( @triple, $context );
 		}
-		
 		my $triple	= (@triple == 3)
 					? RDF::Trine::Statement->new( @triple )
 					: RDF::Trine::Statement::Quad->new( @triple );
