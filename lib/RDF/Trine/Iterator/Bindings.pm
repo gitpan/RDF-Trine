@@ -23,6 +23,7 @@ RDF::Trine::Iterator::Bindings - Stream (iterator) class for bindings query resu
 
 package RDF::Trine::Iterator::Bindings;
 
+use utf8;
 use strict;
 use warnings;
 no warnings 'redefine';
@@ -40,7 +41,7 @@ use base qw(RDF::Trine::Iterator);
 
 our ($VERSION);
 BEGIN {
-	$VERSION	= 0.108;
+	$VERSION	= '0.110_01';
 }
 
 =item C<new ( \@results, \@names, %args )>
@@ -495,7 +496,7 @@ sub as_string {
 
 	my @rule			= qw(- +);
 	my @headers			= (\q"| ");
-	push @headers => map { $_ => \q" | " } @$headers;
+	push(@headers, map { $_ => \q" | " } @$headers);
 	pop	@headers;
 	push @headers => (\q" |");
 	
@@ -510,11 +511,13 @@ sub as_string {
 			$table->body_rule(@rule);
 			$table->load(@$rows);
 		
-			return $table->rule(@rule),
+			return join('',
+					$table->rule(@rule),
 					$table->title,
 					$table->rule(@rule),
 					map({ $table->body($_) } 0 .. @$rows),
-					$table->rule(@rule);
+					$table->rule(@rule)
+				);
 		} else {
 			die("make_table() rows must be an AoA with rows being same size as headers");
 		}
@@ -685,7 +688,7 @@ L<Scalar::Util|Scalar::Util>
 
 =head1 AUTHOR
 
-Gregory Todd Williams  C<< <greg@evilfunhouse.com> >>
+Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 
 =head1 LICENCE AND COPYRIGHT

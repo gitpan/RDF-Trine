@@ -45,7 +45,7 @@ use Scalar::Util qw(blessed reftype);
 
 our ($VERSION);
 BEGIN {
-	$VERSION	= 0.108;
+	$VERSION	= '0.110_01';
 }
 
 =item C<< new ( \@results, \@names, %args ) >>
@@ -133,7 +133,7 @@ __END__
 
 =head1 AUTHOR
 
-Gregory Todd Williams  C<< <greg@evilfunhouse.com> >>
+Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 
 =head1 LICENCE AND COPYRIGHT

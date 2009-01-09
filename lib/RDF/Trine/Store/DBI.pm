@@ -5,7 +5,7 @@ RDF::Trine::Store::DBI - [One line description of module's purpose here]
 
 =head1 VERSION
 
-This document describes RDF::Trine::Store::DBI version 0.108
+This document describes RDF::Trine::Store::DBI version 0.110_01
 
 
 =head1 SYNOPSIS
@@ -61,7 +61,7 @@ use RDF::Trine::Store::DBI::mysql;
 use RDF::Trine::Store::DBI::SQLite;
 use RDF::Trine::Store::DBI::Pg;
 
-our $VERSION	= "0.108";
+our $VERSION	= "0.110_01";
 
 
 
@@ -1156,9 +1156,10 @@ sub init {
 	my $dbh		= $self->dbh;
 	my $name	= $self->model_name;
 	my $id		= _mysql_hash( $name );
+	my $l		= Log::Log4perl->get_logger("rdf.trine.store.dbi");
 	
 	$dbh->begin_work;
-	$dbh->do( <<"END" ) || do { $dbh->rollback; return undef };
+	$dbh->do( <<"END" ) || do { $l->trace( $dbh->errstr ); $dbh->rollback; return undef };
         CREATE TABLE Literals (
             ID NUMERIC(20) PRIMARY KEY,
             Value text NOT NULL,
@@ -1166,39 +1167,39 @@ sub init {
             Datatype text NOT NULL DEFAULT ''
         );
 END
-	$dbh->do( <<"END" ) || do { $dbh->rollback; return undef };
+	$dbh->do( <<"END" ) || do { $l->trace( $dbh->errstr ); $dbh->rollback; return undef };
         CREATE TABLE Resources (
             ID NUMERIC(20) PRIMARY KEY,
             URI text NOT NULL
         );
 END
-	$dbh->do( <<"END" ) || do { $dbh->rollback; return undef };
+	$dbh->do( <<"END" ) || do { $l->trace( $dbh->errstr ); $dbh->rollback; return undef };
         CREATE TABLE Bnodes (
             ID NUMERIC(20) PRIMARY KEY,
             Name text NOT NULL
         );
 END
-	$dbh->do( <<"END" ) || do { $dbh->rollback; return undef };
+	$dbh->do( <<"END" ) || do { $l->trace( $dbh->errstr ); $dbh->rollback; return undef };
         CREATE TABLE Models (
             ID NUMERIC(20) PRIMARY KEY,
             Name text NOT NULL
         );
 END
     
-	$dbh->do( <<"END" ) || do { $dbh->rollback; return undef };
+	$dbh->do( <<"END" ) || do { $l->trace( $dbh->errstr ); $dbh->rollback; return undef };
         CREATE TABLE Statements${id} (
             Subject NUMERIC(20) NOT NULL,
             Predicate NUMERIC(20) NOT NULL,
             Object NUMERIC(20) NOT NULL,
             Context NUMERIC(20) NOT NULL DEFAULT 0,
-            UNIQUE (Subject, Predicate, Object, Context)
+            PRIMARY KEY (Subject, Predicate, Object, Context)
         );
 END
 
-	$dbh->do( "DELETE FROM Models WHERE ID = ${id}") || do { $dbh->rollback; return undef };
-	$dbh->do( "INSERT INTO Models (ID, Name) VALUES (${id}, ?)", undef, $name ) || do { $dbh->rollback; return undef };
+	$dbh->do( "DELETE FROM Models WHERE ID = ${id}") || do { $l->trace( $dbh->errstr ); $dbh->rollback; return undef };
+	$dbh->do( "INSERT INTO Models (ID, Name) VALUES (${id}, ?)", undef, $name ) || do { $l->trace( $dbh->errstr ); $dbh->rollback; return undef };
 	
-	$dbh->commit;
+	$dbh->commit or die $dbh->errstr;
 }
 
 sub _cleanup {

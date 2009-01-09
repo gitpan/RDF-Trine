@@ -39,7 +39,7 @@ use base qw(RDF::Trine::Iterator);
 
 our ($VERSION);
 BEGIN {
-	$VERSION	= 0.108;
+	$VERSION	= '0.110_01';
 }
 
 ######################################################################
@@ -285,7 +285,7 @@ L<Scalar::Util|Scalar::Util>
 
 =head1 AUTHOR
 
-Gregory Todd Williams  C<< <greg@evilfunhouse.com> >>
+Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 
 =head1 LICENCE AND COPYRIGHT
