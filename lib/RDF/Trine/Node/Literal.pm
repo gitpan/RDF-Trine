@@ -7,7 +7,7 @@ RDF::Trine::Node::Literal - RDF Node class for literals
 
 =head1 VERSION
 
-This document describes RDF::Trine::Node::Literal version 0.111
+This document describes RDF::Trine::Node::Literal version 0.112_01
 
 =cut
 
@@ -27,7 +27,7 @@ use Carp qw(carp croak confess);
 
 our ($VERSION, $USE_XMLLITERALS);
 BEGIN {
-	$VERSION	= '0.111';
+	$VERSION	= '0.112_01';
 	eval "use RDF::Trine::Node::Literal::XML;";
 	$USE_XMLLITERALS	= (RDF::Trine::Node::Literal::XML->can('new')) ? 1 : 0;
 }
@@ -160,6 +160,35 @@ sub as_string {
 		$string	.= '@' . $self->literal_value_language;
 	}
 	return $string;
+}
+
+=item C<< as_ntriples >>
+
+Returns the node in a string form suitable for NTriples serialization.
+
+=cut
+
+sub as_ntriples {
+	my $self	= shift;
+	my $literal	= $self->literal_value;
+	$literal	=~ s/\\/\\\\/g;
+	
+	my $escaped	= $self->_unicode_escape( $literal );
+	$literal	= $escaped;
+	
+	$literal	=~ s/"/\\"/g;
+	$literal	=~ s/\n/\\n/g;
+	$literal	=~ s/\r/\\r/g;
+	$literal	=~ s/\t/\\t/g;
+	if ($self->has_language) {
+		my $lang	= $self->literal_value_language;
+		return qq("${literal}"\@${lang});
+	} elsif ($self->has_datatype) {
+		my $dt		= $self->literal_datatype;
+		return qq("${literal}"^^<${dt}>);
+	} else {
+		return qq("${literal}");
+	}
 }
 
 =item C<< type >>

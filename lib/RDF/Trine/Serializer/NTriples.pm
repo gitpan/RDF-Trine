@@ -7,7 +7,7 @@ RDF::Trine::Serializer::NTriples - NTriples Serializer.
 
 =head1 VERSION
 
-This document describes RDF::Trine::Serializer::NTriples version 0.111
+This document describes RDF::Trine::Serializer::NTriples version 0.112_01
 
 =head1 SYNOPSIS
 
@@ -43,7 +43,7 @@ use RDF::Trine::Error qw(:try);
 
 our ($VERSION);
 BEGIN {
-	$VERSION	= '0.111';
+	$VERSION	= '0.112_01';
 }
 
 ######################################################################
@@ -75,8 +75,7 @@ sub serialize_model_to_file {
 	my $model	= shift;
 	my $iter	= $model->as_stream;
 	while (my $st = $iter->next) {
-		my @nodes	= $st->nodes;
-		print {$file} join(' ', map { $_->sse } @nodes) . " .\n";
+		print {$file} join(' ', map { $_->as_ntriples } $st->nodes) . " .\n";
 	}
 }
 

@@ -7,7 +7,7 @@ RDF::Trine::Model - Model class
 
 =head1 VERSION
 
-This document describes RDF::Trine::Model version 0.111
+This document describes RDF::Trine::Model version 0.112_01
 
 =head1 METHODS
 
@@ -23,7 +23,7 @@ no warnings 'redefine';
 
 our ($VERSION);
 BEGIN {
-	$VERSION	= '0.111';
+	$VERSION	= '0.112_01';
 }
 
 use Scalar::Util qw(blessed);
@@ -53,6 +53,61 @@ Adds the specified C<$statement> to the rdf store.
 sub add_statement {
 	my $self	= shift;
 	return $self->_store->add_statement( @_ );
+}
+
+=item C<< add_hashref ( $hashref [, $context] ) >>
+
+Add triples represented in an RDF/JSON-like manner to the model.
+
+See C<as_hashref> for full documentation of the hashref format.
+
+=cut
+
+sub add_hashref {
+	my $self	   = shift;
+	my $index   = shift;
+	my $context = shift;
+	
+	foreach my $s (keys %$index) {
+		my $ts = ( $s =~ /^_:(.*)$/ ) ?
+		         RDF::Trine::Node::Blank->new($1) :
+					RDF::Trine::Node::Resource->new($s);
+		
+		foreach my $p (keys %{ $index->{$s} }) {
+			my $tp = RDF::Trine::Node::Resource->new($p);
+			
+			foreach my $O (@{ $index->{$s}->{$p} }) {
+				my $to;
+				
+				# $O should be a hashref, but we can do a little error-correcting.
+				unless (ref $O) {
+					if ($O =~ /^_:/) {
+						$O = { 'value'=>$O, 'type'=>'bnode' };
+					} elsif ($O =~ /^[a-z0-9._\+-]{1,12}:\S+$/i) {
+						$O = { 'value'=>$O, 'type'=>'uri' };
+					} elsif ($O =~ /^(.*)\@([a-z]{2})$/) {
+						$O = { 'value'=>$1, 'type'=>'literal', 'lang'=>$2 };
+					} else {
+						$O = { 'value'=>$O, 'type'=>'literal' };
+					}
+				}
+				
+				if (lc $O->{'type'} eq 'literal') {
+					$to = RDF::Trine::Node::Literal->new(
+						$O->{'value'}, $O->{'lang'}, $O->{'datatype'});
+				} else {
+					$to = ( $O->{'value'} =~ /^_:(.*)$/ ) ?
+						RDF::Trine::Node::Blank->new($1) :
+						RDF::Trine::Node::Resource->new($O->{'value'});
+				}
+				
+				if ( $ts && $tp && $to ) {
+					my $st = RDF::Trine::Statement->new($ts, $tp, $to);
+					$self->add_statement($st, $context);
+				}
+			}
+		}
+	}
 }
 
 =item C<< remove_statement ( $statement [, $context]) >>
@@ -140,6 +195,83 @@ sub as_stream {
 	my $self	= shift;
 	my $stream	= $self->get_statements( map { RDF::Trine::Node::Variable->new($_) } qw(s p o) );
 	return $stream;
+}
+
+=item C<< as_hashref >>
+
+Returns a hashref representing the model in an RDF/JSON-like manner.
+
+A graph like this (in Turtle):
+
+  @prefix ex: <http://example.com/> .
+  
+  ex:subject1
+    ex:predicate1
+      "Foo"@en ,
+      "Bar"^^ex:datatype1 .
+  
+  _:bnode1
+    ex:predicate2
+      ex:object2 ;
+    ex:predicate3 ;
+      _:bnode3 .
+
+Is represented like this as a hashref:
+
+  {
+    "http://example.com/subject1" => {
+      "http://example.com/predicate1" => [
+        { 'type'=>'literal', 'value'=>"Foo", 'lang'=>"en" },
+        { 'type'=>'literal', 'value'=>"Bar", 'datatype'=>"http://example.com/datatype1" },
+      ],
+    },
+    "_:bnode1" => {
+      "http://example.com/predicate2" => [
+        { 'type'=>'uri', 'value'=>"http://example.com/object2" },
+      ],
+      "http://example.com/predicate2" => [
+        { 'type'=>'bnode', 'value'=>"_:bnode3" },
+      ],
+    },
+  }
+
+Note that the type of subjects (resource or blank node) is indicated
+entirely by the convention of starting blank nodes with "_:".
+
+This hashref structure is compatible with RDF/JSON and with the ARC2
+library for PHP.
+
+=cut
+
+sub as_hashref {
+	my $self	= shift;
+	my $stream	= $self->as_stream;
+	my $index = {};
+	while (my $statement = $stream->next) {
+		
+		my $s = $statement->subject->is_blank ? 
+			('_:'.$statement->subject->blank_identifier) :
+			$statement->subject->uri ;
+		my $p = $statement->predicate->uri ;
+		
+		my $o = {};
+		if ($statement->object->is_literal) {
+			$o->{'type'}     = 'literal';
+			$o->{'value'}    = $statement->object->literal_value;
+			$o->{'lang'}     = $statement->object->literal_value_language
+				if $statement->object->has_language;
+			$o->{'datatype'} = $statement->object->literal_datatype
+				if $statement->object->has_datatype;
+		} else {
+			$o->{'type'}  = $statement->object->is_blank ? 'bnode' : 'uri';
+			$o->{'value'} = $statement->object->is_blank ? 
+				('_:'.$statement->object->blank_identifier) :
+				$statement->object->uri ;
+		}
+
+		push @{ $index->{$s}->{$p} }, $o;
+	}
+	return $index;
 }
 
 sub _store {

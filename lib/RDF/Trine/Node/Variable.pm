@@ -7,7 +7,7 @@ RDF::Trine::Node::Variable - RDF Node class for variables
 
 =head1 VERSION
 
-This document describes RDF::Trine::Node::Variable version 0.111
+This document describes RDF::Trine::Node::Variable version 0.112_01
 
 =cut
 
@@ -26,7 +26,7 @@ use Carp qw(carp croak confess);
 
 our ($VERSION);
 BEGIN {
-	$VERSION	= '0.111';
+	$VERSION	= '0.112_01';
 }
 
 ######################################################################
@@ -81,6 +81,17 @@ Returns a string representation of the node.
 sub as_string {
 	my $self	= shift;
 	return '?' . $self->name;
+}
+
+=item C<< as_ntriples >>
+
+Returns the node in a string form suitable for NTriples serialization.
+
+=cut
+
+sub as_ntriples {
+	my $self	= shift;
+	Carp::confess "Variable nodes aren't allowed in NTriples: " . Dumper($self);
 }
 
 =item C<< type >>

@@ -7,7 +7,7 @@ RDF::Trine::Node::Resource - RDF Node class for resources
 
 =head1 VERSION
 
-This document describes RDF::Trine::Node::Resource version 0.111
+This document describes RDF::Trine::Node::Resource version 0.112_01
 
 =cut
 
@@ -27,7 +27,7 @@ use Carp qw(carp croak confess);
 
 our ($VERSION);
 BEGIN {
-	$VERSION	= '0.111';
+	$VERSION	= '0.112_01';
 }
 
 ######################################################################
@@ -162,6 +162,52 @@ Returns a string representation of the node.
 sub as_string {
 	my $self	= shift;
 	return '<' . $self->uri_value . '>';
+}
+
+=item C<< as_ntriples >>
+
+Returns the node in a string form suitable for NTriples serialization.
+
+=cut
+
+sub as_ntriples {
+	my $self	= shift;
+	my $context	= shift;
+	my $uri		= $self->uri_value;
+	
+	if (ref($uri) and reftype($uri) eq 'ARRAY') {
+		die;
+	} else {
+		my $ns		= $context->{namespaces} || {};
+		while (my ($k, $v) = each(%$ns)) {
+			if (index($uri, $v) == 0) {
+				my $qname	= join(':', $k, substr($uri, length($v)));
+				return $qname;
+			}
+		}
+		
+		my $qname	= 0;
+		my $string	= qq(${uri});
+		foreach my $n (keys %$ns) {
+			if (substr($uri, 0, length($ns->{ $n })) eq $ns->{ $n }) {
+				$string	= join(':', $n, substr($uri, length($ns->{ $n })));
+				$qname	= 1;
+				last;
+			}
+		}
+		
+		$string	=~ s/\\/\\\\/g;
+		my $escaped	= $self->_unicode_escape( $string );
+		if ($qname) {
+			return $escaped;
+		} else {
+			$escaped	=~ s/"/\\"/g;
+			$escaped	=~ s/\n/\\n/g;
+			$escaped	=~ s/\r/\\r/g;
+			$escaped	=~ s/\t/\\t/g;
+			return '<' . $escaped . '>';
+		}
+	}
 }
 
 =item C<< type >>

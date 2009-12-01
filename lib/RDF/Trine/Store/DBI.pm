@@ -5,7 +5,7 @@ RDF::Trine::Store::DBI - [One line description of module's purpose here]
 
 =head1 VERSION
 
-This document describes RDF::Trine::Store::DBI version 0.111
+This document describes RDF::Trine::Store::DBI version 0.112_01
 
 =head1 SYNOPSIS
 
@@ -60,7 +60,7 @@ use RDF::Trine::Store::DBI::mysql;
 use RDF::Trine::Store::DBI::SQLite;
 use RDF::Trine::Store::DBI::Pg;
 
-our $VERSION	= "0.111";
+our $VERSION	= "0.112_01";
 
 
 
@@ -151,15 +151,20 @@ sub get_statements {
 	
 	my $dbh		= $self->dbh;
 	my $triple	= RDF::Trine::Statement->new( $subj, $pred, $obj );
+	
+	my $l		= Log::Log4perl->get_logger("rdf.trine.store.dbi");
+	
 	my @vars	= $triple->referenced_variables;
 	
 	local($self->{context_variable_count})	= 0;
 	local($self->{join_context_nodes})		= 1 if (blessed($context) and $context->is_variable);
 	my $sql		= $self->_sql_for_pattern( $triple, $context, @_ );
 	my $sth		= $dbh->prepare( $sql );
+	
 	$sth->execute();
 	
 	my $sub		= sub {
+NEXTROW:
 		my $row	= $sth->fetchrow_hashref;
 		return undef unless (defined $row);
 		my @triple;
@@ -178,7 +183,8 @@ sub get_statements {
 					my @cols	= map { $self->_column_name( $nodename, $_ ) } qw(Value Language Datatype);
 					push( @triple, RDF::Trine::Node::Literal->new( @{ $row }{ @cols } ) );
 				} else {
-					push( @triple, undef );
+					warn "node isn't a resource, blank, or literal?" . Dumper($row);
+					goto NEXTROW;
 				}
 			} else {
 				push(@triple, $node);
@@ -230,6 +236,8 @@ sub get_pattern {
 	my %args	= @_;
 	
 	my $l		= Log::Log4perl->get_logger("rdf.trine.store.dbi");
+	$l->trace("get_pattern called for: " . $pattern->sse);
+	
 	if (my $o = $args{ orderby }) {
 		my @ordering	= @$o;
 		while (my ($col, $dir) = splice( @ordering, 0, 2, () )) {
@@ -245,7 +253,6 @@ sub get_pattern {
 	my %vars	= map { $_ => 1 } @vars;
 	
 	my $sql		= $self->_sql_for_pattern( $pattern, $context, %args );
-	
 	$l->debug("get_pattern sql: $sql\n");
 	
 	my $sth		= $dbh->prepare( $sql );
@@ -374,6 +381,9 @@ sub remove_statement {
 	my $context	= shift;
 	my $dbh		= $self->dbh;
 	my $stable	= $self->statements_table;
+	unless (blessed($stmt)) {
+		Carp::confess "no statement passed to remove_statement";
+	}
 	my @nodes	= $stmt->nodes;
 	my $sth		= $dbh->prepare("DELETE FROM ${stable} WHERE Subject = ? AND Predicate = ? AND Object = ? AND Context = ?");
 	my @values	= map { $self->_mysql_node_hash( $_ ) } (@nodes, $context);
@@ -1124,7 +1134,6 @@ sub make_private_predicate_view {
 	my $stable		= join('', $prefix, $oldpre, $id);
 	my $predlist	= join(', ', map { $self->_mysql_node_hash( $_ ) } (@preds));
 	my $sql			= "CREATE VIEW ${stable} AS SELECT * FROM ${oldtable} WHERE Predicate NOT IN (${predlist})";
-	warn $sql;
 	
 	my $dbh			= $self->dbh;
 	$dbh->do( $sql );
