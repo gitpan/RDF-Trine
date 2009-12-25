@@ -7,7 +7,7 @@ RDF::Trine::Model - Model class
 
 =head1 VERSION
 
-This document describes RDF::Trine::Model version 0.112
+This document describes RDF::Trine::Model version 0.113_01
 
 =head1 METHODS
 
@@ -23,12 +23,13 @@ no warnings 'redefine';
 
 our ($VERSION);
 BEGIN {
-	$VERSION	= '0.112';
+	$VERSION	= '0.113_01';
 }
 
 use Scalar::Util qw(blessed);
 use Log::Log4perl;
 use RDF::Trine::Node;
+use RDF::Trine::Pattern;
 use RDF::Trine::Store::DBI;
 
 =item C<< new ( @stores ) >>
@@ -46,7 +47,7 @@ sub new {
 
 =item C<< add_statement ( $statement [, $context] ) >>
 
-Adds the specified C<$statement> to the rdf store.
+Adds the specified C<< $statement >> to the rdf store.
 
 =cut
 
@@ -59,7 +60,7 @@ sub add_statement {
 
 Add triples represented in an RDF/JSON-like manner to the model.
 
-See C<as_hashref> for full documentation of the hashref format.
+See C<< as_hashref >> for full documentation of the hashref format.
 
 =cut
 
@@ -112,7 +113,7 @@ sub add_hashref {
 
 =item C<< remove_statement ( $statement [, $context]) >>
 
-Removes the specified C<$statement> from the rdf store.
+Removes the specified C<< $statement >> from the rdf store.
 
 =cut
 
@@ -121,9 +122,9 @@ sub remove_statement {
 	return $self->_store->remove_statement( @_ );
 }
 
-=item C<< remove_statements ( $subject, $predicate, $object [, $context]) >>
+=item C<< remove_statements ( $subject, $predicate, $object [, $context] ) >>
 
-Removes all statements matching the supplied C<$statement> pattern from the rdf store.
+Removes all statements matching the supplied C<< $statement >> pattern from the rdf store.
 
 =cut
 
@@ -132,7 +133,18 @@ sub remove_statements {
 	return $self->_store->remove_statements( @_ );
 }
 
-=item C<< count_statements ($subject, $predicate, $object) >>
+=item C<< size >>
+
+Returns the number of statements in the model.
+
+=cut
+
+sub size {
+	my $self	= shift;
+	return $self->count_statements();
+}
+
+=item C<< count_statements ( $subject, $predicate, $object ) >>
 
 Returns a count of all the statements matching the specified subject,
 predicate and objects. Any of the arguments may be undef to match any value.
@@ -157,9 +169,19 @@ sub get_statements {
 	return $self->_store->get_statements( @_ );
 }
 
-=item C<< get_pattern ( $bgp [, $context] ) >>
+=item C<< get_pattern ( $bgp [, $context] [, %args ] ) >>
 
 Returns a stream object of all bindings matching the specified graph pattern.
+
+If C<< $context >> is given, restricts BGP matching to only quads with the
+C<< $context >> value.
+
+C<< %args >> may contain an 'orderby' key-value pair to request a specific
+ordering based on variable name. The value for the 'orderby' key should be an
+ARRAY reference containing variable name and direction ('ASC' or 'DESC') tuples.
+A valid C<< %args >> hash, therefore, might look like
+C<< orderby => [qw(name ASC)] >> (corresponding to a SPARQL-like request to
+'ORDER BY ASC(?name)').
 
 =cut
 
@@ -193,8 +215,10 @@ Returns an iterator object containing every statement in the model.
 
 sub as_stream {
 	my $self	= shift;
-	my $stream	= $self->get_statements( map { RDF::Trine::Node::Variable->new($_) } qw(s p o) );
-	return $stream;
+	my $st		= RDF::Trine::Statement->new( map { RDF::Trine::Node::Variable->new($_) } qw(s p o) );
+	my $pat		= RDF::Trine::Pattern->new( $st );
+	my $stream	= $self->get_pattern( $pat, undef, orderby => [ qw(s ASC p ASC o ASC) ] );
+	return $stream->as_statements( qw(s p o) );
 }
 
 =item C<< as_hashref >>
@@ -272,6 +296,29 @@ sub as_hashref {
 		push @{ $index->{$s}->{$p} }, $o;
 	}
 	return $index;
+}
+
+=item C<< objects_for_predicate_list ( $subject, @predicates ) >>
+
+Given the RDF::Trine::Node objects C<< $subject >> and C<< @predicates >>,
+finds all matching triples in the model with the specified subject and any
+of the given predicates, and returns a list of object values (in the partial
+order given by the ordering of C<< @predicates >>).
+
+=cut
+
+sub objects_for_predicate_list {
+	my $self	= shift;
+	my $node	= shift;
+	my @preds	= @_;
+	my @objects;
+	foreach my $p (@preds) {
+		my $iter	= $self->get_statements( $node, $p );
+		while (my $s = $iter->next) {
+			push( @objects, $s->object );
+		}
+	}
+	return @objects;
 }
 
 sub _store {

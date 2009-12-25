@@ -7,7 +7,7 @@ RDF::Trine::Serializer::RDFJSON - RDF/JSON Serializer.
 
 =head1 VERSION
 
-This document describes RDF::Trine::Serializer::RDF/JSON version 0.112
+This document describes RDF::Trine::Serializer::RDF/JSON version 0.113_01
 
 =head1 SYNOPSIS
 
@@ -28,6 +28,7 @@ package RDF::Trine::Serializer::RDFJSON;
 
 use strict;
 use warnings;
+use base qw(RDF::Trine::Serializer);
 
 use URI;
 use Carp;
@@ -43,7 +44,7 @@ use RDF::Trine::Error qw(:try);
 
 our ($VERSION);
 BEGIN {
-	$VERSION	= '0.112';
+	$VERSION	= '0.113_01';
 }
 
 ######################################################################
@@ -77,7 +78,7 @@ sub serialize_model_to_file {
 	my $model  = shift;
 	my $opts   = shift;
 	my $string = to_json($model->as_hashref, $opts);
-	print {$file} $string . " .\n";
+	print {$file} $string;
 }
 
 =item C<< serialize_model_to_string ( $model [,\%json_options] ) >>
@@ -110,6 +111,12 @@ http://n2.talis.com/wiki/RDF_JSON_Specification
 
  Toby Inkster <tobyink@cpan.org>
  Gregory Williams <gwilliams@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2009 Toby Inkster. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms as Perl
+itself.
 
 =cut
 

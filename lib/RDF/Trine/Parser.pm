@@ -7,13 +7,13 @@ RDF::Trine::Parser - RDF Parser class.
 
 =head1 VERSION
 
-This document describes RDF::Trine::Parser version 0.112
+This document describes RDF::Trine::Parser version 0.113_01
 
 =head1 SYNOPSIS
 
  use RDF::Trine::Parser;
  my $parser	= RDF::Trine::Parser->new( 'turtle' );
- my $iterator = $parser->parse( $base_uri, $data );
+ $parser->parse_into_model( $base_uri, $rdf, $model );
 
 =head1 DESCRIPTION
 
@@ -30,46 +30,80 @@ package RDF::Trine::Parser;
 use strict;
 use warnings;
 no warnings 'redefine';
+use Data::Dumper;
 
 our ($VERSION);
+our %parser_names;
+our %media_types;
 BEGIN {
-	$VERSION	= '0.112';
+	$VERSION	= '0.113_01';
 }
 
+use LWP::UserAgent;
 use RDF::Trine::Parser::Turtle;
 use RDF::Trine::Parser::RDFXML;
 use RDF::Trine::Parser::RDFJSON;
+use RDF::Trine::Parser::RDFa;
 
-our %types;
-
-=item C<< new ( $type ) >>
+=item C<< new ( $parser_name ) >>
 
 =cut
 
 sub new {
 	my $class	= shift;
-	my $type	= shift;
+	my $name	= shift;
+	my $key		= lc($name);
+	$key		=~ s/[^a-z]//g;
 	
-	if ($type eq 'guess') {
+	if ($name eq 'guess') {
 		die;
-	} elsif (my $class = $types{ $type }) {
+	} elsif (my $class = $parser_names{ $key }) {
 		return $class->new( @_ );
 	} else {
-		throw RDF::Trine::Parser::Error -text => "No parser known for type $type";
+		throw RDF::Trine::Error::ParserError -text => "No parser known named $name";
 	}
 }
 
-=item C<< parse ( $base_uri, $data ) >>
+=item C<< parse_url_into_model ( $url, $model ) >>
 
-=item C<< parse_into_model ( $base_uri, $data, $model ) >>
+Retrieves the content from C<< $url >> and attempts to parse the resulting RDF
+into C<< $model >> using a parser chosen by the associated content media type.
 
 =cut
 
-
+sub parse_url_into_model {
+	my $class	= shift;
+	my $url		= shift;
+	my $model	= shift;
+	
+	my $ua		= LWP::UserAgent->new( agent => "RDF::Trine/$RDF::Trine::VERSION" );
+	my $accept	= join(',', map { /(turtle|rdf+xml)/ ? "$_;q=1.0" : "$_;q=0.9" } keys %media_types);
+	$ua->default_headers->push_header( 'Accept' => $accept );
+	
+	my $resp	= $ua->get( $url );
+	unless ($resp->is_success) {
+		throw RDF::Trine::Error::ParserError -text => $resp->status_line;
+	}
+	
+	my $type	= $resp->header('content-type');
+	$type		=~ s/^([^\s;]+).*/$1/;
+	my $pclass	= $media_types{ $type };
+	if ($pclass and $pclass->can('new')) {
+		my $parser	= $pclass->new();
+		my $content	= $resp->content;
+		return $parser->parse_into_model( $url, $content, $model );
+	} else {
+		throw RDF::Trine::Error -text => "No parser found for content type $type";
+	}
+}
 
 1;
 
 __END__
+
+=item C<< parse ( $base_uri, $rdf, \&handler ) >>
+
+=item C<< parse_into_model ( $base_uri, $data, $model ) >>
 
 =back
 

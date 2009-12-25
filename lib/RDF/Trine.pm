@@ -8,7 +8,7 @@ RDF::Trine - An RDF Framework for Perl.
 
 =head1 VERSION
 
-This document describes RDF::Trine version 0.112
+This document describes RDF::Trine version 0.113_01
 
 =head1 SYNOPSIS
 
@@ -34,10 +34,6 @@ components:
 
 =back
 
-=head1 METHODS
-
-=over 4
-
 =cut
 
 package RDF::Trine;
@@ -46,16 +42,21 @@ use strict;
 use warnings;
 no warnings 'redefine';
 
-our ($debug, $VERSION);
+our ($debug, @ISA, $VERSION, @EXPORT_OK);
 BEGIN {
 	$debug		= 0;
-	$VERSION	= '0.112';
+	$VERSION	= '0.113_01';
+	
+	require Exporter;
+	@ISA		= qw(Exporter);
+	@EXPORT_OK	= qw(iri blank literal);
 }
 
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($ERROR);
 
 use RDF::Trine::Parser;
+use RDF::Trine::Serializer;
 use RDF::Trine::Node;
 use RDF::Trine::Statement;
 use RDF::Trine::Namespace;
@@ -72,6 +73,43 @@ sub _uniq {
 		push(@data, $_) unless ($seen{ $_ }++);
 	}
 	return @data;
+}
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item C<< iri ( $iri ) >>
+
+Returns a RDF::Trine::Node::Resource object with the given IRI value.
+
+=cut
+
+sub iri {
+	my $iri	= shift;
+	return RDF::Trine::Node::Resource->new( $iri );
+}
+
+=item C<< blank ( $id ) >>
+
+Returns a RDF::Trine::Node::Blank object with the given identifier.
+
+=cut
+
+sub blank {
+	my $id	= shift;
+	return RDF::Trine::Node::Blank->new( $id );
+}
+
+=item C<< literal ( $value, $lang, $dt ) >>
+
+Returns a RDF::Trine::Node::Literal object with the given value and optional
+language/datatype.
+
+=cut
+
+sub literal {
+	return RDF::Trine::Node::Literal->new( @_ );
 }
 
 1; # Magic true value required at end of module

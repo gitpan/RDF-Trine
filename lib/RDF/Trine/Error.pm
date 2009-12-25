@@ -7,7 +7,7 @@ RDF::Trine::Error - Error classes for RDF::Trine.
 
 =head1 VERSION
 
-This document describes RDF::Trine::Error version 0.112
+This document describes RDF::Trine::Error version 0.113_01
 
 =head1 SYNOPSIS
 
@@ -37,7 +37,7 @@ use base qw(Error);
 
 our ($VERSION);
 BEGIN {
-	$VERSION	= '0.112';
+	$VERSION	= '0.113_01';
 }
 
 ######################################################################
@@ -62,6 +62,9 @@ package RDF::Trine::Error::DatabaseError;
 
 use base qw(RDF::Trine::Error);
 
+package RDF::Trine::Error::ParserError;
+
+use base qw(RDF::Trine::Error);
 
 1;
 

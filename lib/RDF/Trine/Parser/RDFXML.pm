@@ -7,7 +7,7 @@ RDF::Trine::Parser::RDFXML - RDF/XML Parser.
 
 =head1 VERSION
 
-This document describes RDF::Trine::Parser::RDFXML version 0.112
+This document describes RDF::Trine::Parser::RDFXML version 0.113_01
 
 =head1 SYNOPSIS
 
@@ -30,6 +30,8 @@ package RDF::Trine::Parser::RDFXML;
 use strict;
 use warnings;
 
+use base qw(RDF::Trine::Parser);
+
 use URI;
 use Carp;
 use XML::SAX;
@@ -39,15 +41,16 @@ use Scalar::Util qw(blessed);
 
 use RDF::Trine::Node;
 use RDF::Trine::Statement;
-use RDF::Trine::Parser::Error qw(:try);
+use RDF::Trine::Error qw(:try);
 
 ######################################################################
 
 our ($VERSION);
 BEGIN {
-	$VERSION	= '0.112';
-	foreach my $t ('rdfxml', 'application/rdf+xml') {
-		$RDF::Trine::Parser::types{ $t }	= __PACKAGE__;
+	$VERSION	= '0.113_01';
+	$RDF::Trine::Parser::parser_names{ 'rdfxml' }	= __PACKAGE__;
+	foreach my $type (qw(application/rdf+xml)) {
+		$RDF::Trine::Parser::media_types{ $type }	= __PACKAGE__;
 	}
 }
 
@@ -705,7 +708,7 @@ sub get_namespace {
 			return $uri;
 		}
 	}
-	throw RDF::Trine::Parser::Error::ValueError -text => "Unknown namespace: $prefix";
+	throw RDF::Trine::Error::ParserError -text => "Unknown namespace: $prefix";
 }
 
 sub new_bnode {

@@ -7,7 +7,7 @@ RDF::Trine::Serializer::RDFXML - RDF/XML Serializer.
 
 =head1 VERSION
 
-This document describes RDF::Trine::Serializer::RDFXML version 0.112
+This document describes RDF::Trine::Serializer::RDFXML version 0.113_01
 
 =head1 SYNOPSIS
 
@@ -28,6 +28,7 @@ package RDF::Trine::Serializer::RDFXML;
 
 use strict;
 use warnings;
+use base qw(RDF::Trine::Serializer);
 
 use URI;
 use Carp;
@@ -43,7 +44,7 @@ use RDF::Trine::Error qw(:try);
 
 our ($VERSION);
 BEGIN {
-	$VERSION	= '0.112';
+	$VERSION	= '0.113_01';
 }
 
 ######################################################################
@@ -107,10 +108,89 @@ sub serialize_iterator_to_file {
 	my $fh		= shift;
 	my $iter	= shift;
 	print {$fh} qq[<?xml version="1.0" encoding="utf-8"?>\n<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">\n];
-	while (my $st = $iter->next) {
-		print {$fh} $self->_statement_as_string( $st );
+	
+	my @statements	= $iter->next;
+	while (@statements) {
+		my $st	= shift(@statements);
+		my @samesubj;
+		push(@samesubj, $st);
+		my $subj	= $st->subject;
+		while (my $row = $iter->next) {
+			if ($row->subject->equal( $subj )) {
+				push(@samesubj, $row);
+			} else {
+				push(@statements, $row);
+				last;
+			}
+		}
+		
+		print {$fh} $self->_statements_same_subject_as_string( @samesubj );
 	}
+	
 	print {$fh} qq[</rdf:RDF>\n];
+}
+
+sub _statements_same_subject_as_string {
+	my $self		= shift;
+	my @statements	= @_;
+	return unless (@statements);
+	my $s			= $statements[0]->subject;
+	
+	my $id;
+	if ($s->is_blank) {
+		my $b	= $s->blank_identifier;
+		$id	= qq[rdf:nodeID="$b"];
+	} else {
+		my $i	= $s->uri_value;
+		$id	= qq[rdf:about="$i"];
+	}
+	
+	my $counter	= 1;
+	my %namespaces	= ('http://www.w3.org/1999/02/22-rdf-syntax-ns#' => 'rdf');
+	my $string	= '';
+	foreach my $st (@statements) {
+		my (undef, $p, $o)	= $st->nodes;
+		my ($ns, $ln);
+		try {
+			($ns,$ln)	= $p->qname;
+		} catch RDF::Trine::Error with {
+			my $uri	= $p->uri_value;
+			throw RDF::Trine::Error::SerializationError -text => "Can't turn predicate $uri into a QName.";
+		};
+		unless (exists $namespaces{ $ns }) {
+			$namespaces{ $ns }	= 'ns' . $counter++;
+		}
+		my $prefix	= $namespaces{ $ns };
+		if ($o->is_literal) {
+			my $lv		= $o->literal_value;
+			$lv			=~ s/&/&amp;/g;
+			$lv			=~ s/</&lt;/g;
+			my $lang	= $o->literal_value_language;
+			my $dt		= $o->literal_datatype;
+			my $tag	= join(':', $prefix, $ln);
+			if ($lang) {
+				$string	.= qq[\t<${tag} xml:lang="${lang}">${lv}</${tag}>\n];
+			} elsif ($dt) {
+				$string	.= qq[\t<${tag} rdf:datatype="${dt}">${lv}</${tag}>\n];
+			} else {
+				$string	.= qq[\t<${tag}>${lv}</${tag}>\n];
+			}
+		} elsif ($o->is_blank) {
+			my $b	= $o->blank_identifier;
+			$string	.= qq[\t<${prefix}:$ln rdf:nodeID="$b"/>\n];
+		} else {
+			my $u	= $o->uri_value;
+			$string	.= qq[\t<${prefix}:$ln rdf:resource="$u"/>\n];
+		}
+	}
+	
+	$string	.= qq[</rdf:Description>\n];
+	
+	# rdf namespace is already defined in the <rdf:RDF> tag, so ignore it here
+	delete $namespaces{ 'http://www.w3.org/1999/02/22-rdf-syntax-ns#' };
+	
+	my $namespaces	= join(' ', map { my $ns = $namespaces{$_}; qq[xmlns:${ns}="$_"] } sort { $namespaces{$a} cmp $namespaces{$b} } (keys %namespaces));
+	return qq[<rdf:Description ${namespaces} $id>\n] . $string;
 }
 
 sub _statement_as_string {
@@ -128,7 +208,13 @@ sub _statement_as_string {
 		$id	= qq[rdf:about="$i"];
 	}
 	$string	.= qq[<rdf:Description $id>\n];
-	my ($ns,$ln)	= $self->_split_predicate( $p );
+	my ($ns, $ln);
+	try {
+		($ns,$ln)	= $p->qname;
+	} catch RDF::Trine::Error with {
+		my $uri	= $p->uri_value;
+		throw RDF::Trine::Error::SerializationError -text => "Can't turn predicate $uri into a QName.";
+	};
 	if ($o->is_literal) {
 		my $lv		= $o->literal_value;
 		$lv			=~ s/&/&amp;/g;
@@ -206,24 +292,6 @@ sub __serialize_bounded_description {
 		}
 	}
 	return $string;
-}
-
-sub _split_predicate {
-	my $self	= shift;
-	my $p		= shift;
-	my $uri		= $p->uri_value;
-	
-	my $nameStartChar	= qr<([A-Za-z:_]|[\x{C0}-\x{D6}]|[\x{D8}-\x{D8}]|[\x{F8}-\x{F8}]|[\x{200C}-\x{200C}]|[\x{37F}-\x{1FFF}][\x{200C}-\x{200C}]|[\x{2070}-\x{2070}]|[\x{2C00}-\x{2C00}]|[\x{3001}-\x{3001}]|[\x{F900}-\x{F900}]|[\x{FDF0}-\x{FDF0}]|[\x{10000}-\x{10000}])>;
-	my $nameChar		= qr<$nameStartChar|-|[.]|[0-9]|\x{B7}|[\x{0300}-\x{036F}]|[\x{203F}-\x{2040}]>;
-	my $lnre			= qr<((${nameStartChar})($nameChar)*)>;
-	if ($uri =~ m/${lnre}$/) {
-		my $ln	= $1;
-		my $ns	= substr($uri, 0, length($uri)-length($ln));
-#		warn "QName: " . Dumper([$ns,$ln]);
-		return ($ns, $ln);
-	} else {
-		throw RDF::Trine::Error::SerializationError -text => "Can't turn predicate $uri into a QName.";
-	}
 }
 
 1;

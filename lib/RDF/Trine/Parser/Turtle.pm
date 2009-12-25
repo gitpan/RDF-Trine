@@ -7,7 +7,7 @@ RDF::Trine::Parser::Turtle - Turtle RDF Parser.
 
 =head1 VERSION
 
-This document describes RDF::Trine::Parser::Turtle version 0.112
+This document describes RDF::Trine::Parser::Turtle version 0.113_01
 
 =head1 SYNOPSIS
 
@@ -31,6 +31,7 @@ use strict;
 use warnings;
 no warnings 'redefine';
 no warnings 'once';
+use base qw(RDF::Trine::Parser);
 
 use URI;
 use Data::UUID;
@@ -38,20 +39,21 @@ use Log::Log4perl;
 use RDF::Trine::Statement;
 use RDF::Trine::Namespace;
 use RDF::Trine::Node;
-use RDF::Trine::Parser::Error;
+use RDF::Trine::Error;
 use Scalar::Util qw(blessed looks_like_number);
 
 our ($VERSION, $rdf, $xsd);
 our ($r_boolean, $r_comment, $r_decimal, $r_double, $r_integer, $r_language, $r_lcharacters, $r_line, $r_nameChar_extra, $r_nameStartChar_minus_underscore, $r_scharacters, $r_ucharacters, $r_booltest, $r_nameStartChar, $r_nameChar, $r_prefixName, $r_qname, $r_resource_test, $r_nameChar_test);
 BEGIN {
-	$VERSION				= '0.112';
+	$VERSION				= '0.113_01';
+	$RDF::Trine::Parser::parser_names{ 'turtle' }	= __PACKAGE__;
+	foreach my $type (qw(application/x-turtle application/turtle text/turtle)) {
+		$RDF::Trine::Parser::media_types{ $type }	= __PACKAGE__;
+	}
 	
 	$rdf			= RDF::Trine::Namespace->new('http://www.w3.org/1999/02/22-rdf-syntax-ns#');
 	$xsd			= RDF::Trine::Namespace->new('http://www.w3.org/2001/XMLSchema#');
 	
-	foreach my $t ('turtle', 'application/x-turtle', 'application/turtle') {
-		$RDF::Trine::Parser::types{ $t }	= __PACKAGE__;
-	}
 	$r_boolean				= qr'(?:true|false)';
 	$r_comment				= qr'#[^\r\n]*';
 	$r_decimal				= qr'[+-]?([0-9]+\.[0-9]*|\.([0-9])+)';
@@ -92,7 +94,7 @@ sub new {
 	return $self;
 }
 
-=item C<< parse ( $base_uri, $data ) >>
+=item C<< parse ( $base_uri, $rdf, \&handler ) >>
 
 Parses the C<< $data >>, using the given C<< $base_uri >>. Calls the
 C<< triple >> method for each RDF triple parsed. This method does nothing by
@@ -140,7 +142,7 @@ sub _eat_re {
 	my $l		= Log::Log4perl->get_logger("rdf.trine.parser.turtle");
 	if (not(length($self->{tokens}))) {
 		$l->error("no tokens left ($thing)");
-		throw RDF::Trine::Parser::Error::ValueError -text => "No tokens";
+		throw RDF::Trine::Error::ParserError -text => "No tokens";
 	}
 	
 	if ($self->{tokens} =~ m/^($thing)/) {
@@ -149,7 +151,7 @@ sub _eat_re {
 		return;
 	}
 	$l->error("Expected ($thing) with remaining: $self->{tokens}");
-	throw RDF::Trine::Parser::Error::ValueError -text => "Expected: $thing";
+	throw RDF::Trine::Error::ParserError -text => "Expected: $thing";
 }
 
 sub _eat_re_save {
@@ -158,7 +160,7 @@ sub _eat_re_save {
 	my $l		= Log::Log4perl->get_logger("rdf.trine.parser.turtle");
 	if (not(length($self->{tokens}))) {
 		$l->error("no tokens left ($thing)");
-		throw RDF::Trine::Parser::Error::ValueError -text => "No tokens";
+		throw RDF::Trine::Error::ParserError -text => "No tokens";
 	}
 	
 	if ($self->{tokens} =~ m/^($thing)/) {
@@ -167,7 +169,7 @@ sub _eat_re_save {
 		return $match;
 	}
 	$l->error("Expected ($thing) with remaining: $self->{tokens}");
-	throw RDF::Trine::Parser::Error::ValueError -text => "Expected: $thing";
+	throw RDF::Trine::Error::ParserError -text => "Expected: $thing";
 }
 
 sub _eat {
@@ -176,7 +178,7 @@ sub _eat {
 	my $l		= Log::Log4perl->get_logger("rdf.trine.parser.turtle");
 	if (not(length($self->{tokens}))) {
 		$l->error("no tokens left ($thing)");
-		throw RDF::Trine::Parser::Error::ValueError -text => "No tokens";
+		throw RDF::Trine::Error::ParserError -text => "No tokens";
 	}
 	
 	### thing is a string
@@ -186,7 +188,7 @@ sub _eat {
 	} else {
 		
 		$l->logcluck("expected: $thing, got: $self->{tokens}");
-		throw RDF::Trine::Parser::Error::ValueError -text => "Expected: $thing";
+		throw RDF::Trine::Error::ParserError -text => "Expected: $thing";
 	}
 }
 
@@ -207,7 +209,7 @@ sub _triple {
 	my $o		= shift;
 	foreach my $n ($s, $p, $o) {
 		unless ($n->isa('RDF::Trine::Node')) {
-			throw RDF::Trine::Parser::Error;
+			throw RDF::Trine::Error::ParserError;
 		}
 	}
 	
@@ -657,7 +659,7 @@ sub _ws {
 	} else {
 		my $ws	= $self->_eat_re_save( qr/[\n\r\t ]+/ );
 		unless ($ws =~ /^[\n\r\t ]/) {
-			throw RDF::Trine::Parser::Error::ValueError -text => 'Not whitespace';
+			throw RDF::Trine::Error::ParserError -text => 'Not whitespace';
 		}
 	}
 }

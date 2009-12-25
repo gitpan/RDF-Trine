@@ -2,10 +2,9 @@
 
 RDF::Trine::Store::DBI - [One line description of module's purpose here]
 
-
 =head1 VERSION
 
-This document describes RDF::Trine::Store::DBI version 0.112
+This document describes RDF::Trine::Store::DBI version 0.113_01
 
 =head1 SYNOPSIS
 
@@ -46,6 +45,7 @@ use DBI;
 use Carp;
 use DBI;
 use Scalar::Util qw(blessed reftype refaddr);
+use Encode;
 use Digest::MD5 ('md5');
 use Math::BigInt;
 use Data::Dumper;
@@ -60,7 +60,7 @@ use RDF::Trine::Store::DBI::mysql;
 use RDF::Trine::Store::DBI::SQLite;
 use RDF::Trine::Store::DBI::Pg;
 
-our $VERSION	= "0.112";
+our $VERSION	= "0.113_01";
 
 
 
@@ -1007,7 +1007,7 @@ using the same algorithm that Redland's mysql storage backend uses.
 
 sub _mysql_hash;
 sub _mysql_hash_pp {
-	my $data	= shift;
+	my $data	= encode('utf8', shift);
 	my @data	= unpack('C*', md5( $data ));
 	my $sum		= Math::BigInt->new('0');
 #	my $count	= 0;
