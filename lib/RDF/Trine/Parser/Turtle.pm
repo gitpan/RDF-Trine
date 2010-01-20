@@ -7,13 +7,13 @@ RDF::Trine::Parser::Turtle - Turtle RDF Parser.
 
 =head1 VERSION
 
-This document describes RDF::Trine::Parser::Turtle version 0.113
+This document describes RDF::Trine::Parser::Turtle version 0.114_01
 
 =head1 SYNOPSIS
 
  use RDF::Trine::Parser;
  my $parser	= RDF::Trine::Parser->new( 'turtle' );
- my $iterator = $parser->parse( $base_uri, $data );
+ $parser->parse_into_model( $base_uri, $data, $model );
 
 =head1 DESCRIPTION
 
@@ -45,7 +45,7 @@ use Scalar::Util qw(blessed looks_like_number);
 our ($VERSION, $rdf, $xsd);
 our ($r_boolean, $r_comment, $r_decimal, $r_double, $r_integer, $r_language, $r_lcharacters, $r_line, $r_nameChar_extra, $r_nameStartChar_minus_underscore, $r_scharacters, $r_ucharacters, $r_booltest, $r_nameStartChar, $r_nameChar, $r_prefixName, $r_qname, $r_resource_test, $r_nameChar_test);
 BEGIN {
-	$VERSION				= '0.113';
+	$VERSION				= '0.114_01';
 	$RDF::Trine::Parser::parser_names{ 'turtle' }	= __PACKAGE__;
 	foreach my $type (qw(application/x-turtle application/turtle text/turtle)) {
 		$RDF::Trine::Parser::media_types{ $type }	= __PACKAGE__;
@@ -117,7 +117,7 @@ sub parse {
 	return;
 }
 
-=item C<< parse_into_model ( $base_uri, $data, $model ) >>
+=item C<< parse_into_model ( $base_uri, $data, $model [, $context] ) >>
 
 Parses the C<< $data >>, using the given C<< $base_uri >>. For each RDF triple
 parsed, will call C<< $model->add_statement( $statement ) >>.
@@ -125,13 +125,22 @@ parsed, will call C<< $model->add_statement( $statement ) >>.
 =cut
 
 sub parse_into_model {
-	my $self	= shift;
+	my $proto	= shift;
+	my $self	= blessed($proto) ? $proto : $proto->new();
 	my $uri		= shift;
 	my $input	= shift;
 	my $model	= shift;
+	my %args	= @_;
+	my $context	= $args{'context'};
+	
 	my $handler	= sub {
 		my $st	= shift;
-		$model->add_statement( $st );
+		if ($context) {
+			my $quad	= RDF::Trine::Statement::Quad->new( $st->nodes, $context );
+			$model->add_statement( $quad );
+		} else {
+			$model->add_statement( $st );
+		}
 	};
 	return $self->parse( $uri, $input, $handler );
 }
@@ -995,7 +1004,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2006-2009 Gregory Todd Williams. All rights reserved. This
+Copyright (c) 2006-2010 Gregory Todd Williams. All rights reserved. This
 program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
