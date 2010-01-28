@@ -7,7 +7,7 @@ RDF::Trine - An RDF Framework for Perl.
 
 =head1 VERSION
 
-This document describes RDF::Trine version 0.114
+This document describes RDF::Trine version 0.115_01
 
 =head1 SYNOPSIS
 
@@ -23,7 +23,9 @@ components:
 
 =item * RDF::Trine::Model - RDF model providing access to a triple store.
 
-=item * RDF::Trine::Parser - Native RDF parsers (currently RDF/XML and Turtle only).
+=item * RDF::Trine::Parser - RDF parsers for various serialization formats including RDF/XML, Turtle, RDFa, and RDF/JSON.
+
+=item * RDF::Trine::Store::Memory - An in-memory, non-persistant triple store.
 
 =item * RDF::Trine::Store::DBI - A triple store for MySQL and SQLite, based on the Redland schema.
 
@@ -44,7 +46,7 @@ no warnings 'redefine';
 our ($debug, @ISA, $VERSION, @EXPORT_OK);
 BEGIN {
 	$debug		= 0;
-	$VERSION	= '0.114';
+	$VERSION	= '0.115_01';
 	
 	require Exporter;
 	@ISA		= qw(Exporter);
