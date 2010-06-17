@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-RDF::Trine::Graph - Materialized RDF Graphs for testing isomorphism.
+RDF::Trine::Graph - Materialized RDF Graphs for testing isomorphism
 
 =head1 VERSION
 
-This document describes RDF::Trine::Graph version 0.123
+This document describes RDF::Trine::Graph version 0.124_01
 
 =head1 SYNOPSIS
 
@@ -33,7 +33,7 @@ use Math::Combinatorics qw(permute);
 our ($VERSION, $debug);
 BEGIN {
 	$debug		= 0;
-	$VERSION	= '0.123';
+	$VERSION	= '0.124_01';
 }
 
 use Data::Dumper;
