@@ -4,7 +4,7 @@ RDF::Trine::Store::SPARQL - RDF Store proxy for a SPARQL endpoint
 
 =head1 VERSION
 
-This document describes RDF::Trine::Store::SPARQL version 0.124
+This document describes RDF::Trine::Store::SPARQL version 0.125_01
 
 =head1 SYNOPSIS
 
@@ -38,7 +38,7 @@ use RDF::Trine::Error qw(:try);
 my @pos_names;
 our $VERSION;
 BEGIN {
-	$VERSION	= "0.124";
+	$VERSION	= "0.125_01";
 	my $class	= __PACKAGE__;
 	$RDF::Trine::Store::STORE_CLASSES{ $class }	= $VERSION;
 	@pos_names	= qw(subject predicate object context);
@@ -54,6 +54,23 @@ BEGIN {
 
 Returns a new storage object that will act as a proxy for the SPARQL endpoint
 accessible via the supplied C<$url>.
+
+=item C<new_with_config ( $hashref )>
+
+Returns a new storage object configured with a hashref with certain
+keys as arguments.
+
+The C<storetype> key must be C<SPARQL> for this backend.
+
+The following key must also be used:
+
+=over
+
+=item C<url>
+
+The URL of the remote endpoint.
+
+=back
 
 =cut
 
@@ -75,6 +92,14 @@ sub _new_with_string {
 	my $config	= shift;
 	return $class->new( $config );
 }
+
+sub _new_with_config {
+	my $class	= shift;
+	my $config	= shift;
+	return $class->new( $config->{url} );
+}
+
+
 
 =item C<< get_statements ( $subject, $predicate, $object [, $context] ) >>
 

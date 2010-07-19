@@ -7,7 +7,7 @@ RDF::Trine::Serializer - RDF Serializer class
 
 =head1 VERSION
 
-This document describes RDF::Trine::Serializer version 0.124
+This document describes RDF::Trine::Serializer version 0.125_01
 
 =head1 SYNOPSIS
 
@@ -31,9 +31,10 @@ use HTTP::Negotiate qw(choose);
 
 our ($VERSION);
 our %serializer_names;
+our %format_uris;
 our %media_types;
 BEGIN {
-	$VERSION	= '0.124';
+	$VERSION	= '0.125_01';
 }
 
 use LWP::UserAgent;

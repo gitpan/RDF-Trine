@@ -7,7 +7,7 @@ RDF::Trine::Model - Model class
 
 =head1 VERSION
 
-This document describes RDF::Trine::Model version 0.124
+This document describes RDF::Trine::Model version 0.125_01
 
 =head1 METHODS
 
@@ -23,7 +23,7 @@ no warnings 'redefine';
 
 our ($VERSION);
 BEGIN {
-	$VERSION	= '0.124';
+	$VERSION	= '0.125_01';
 }
 
 use Scalar::Util qw(blessed);
@@ -440,7 +440,8 @@ sub subjects {
 	my $self	= shift;
 	my $pred	= shift;
 	my $obj		= shift;
-	my $iter	= $self->get_statements( undef, $pred, $obj );
+	my $graph	= shift;
+	my $iter	= $self->get_statements( undef, $pred, $obj, $graph );
 	my %nodes;
 	while (my $st = $iter->next) {
 		my $subj	= $st->subject;
@@ -465,7 +466,8 @@ sub predicates {
 	my $self	= shift;
 	my $subj	= shift;
 	my $obj		= shift;
-	my $iter	= $self->get_statements( $subj, undef, $obj );
+	my $graph	= shift;
+	my $iter	= $self->get_statements( $subj, undef, $obj, $graph );
 	my %nodes;
 	while (my $st = $iter->next) {
 		my $pred	= $st->predicate;
@@ -490,7 +492,8 @@ sub objects {
 	my $self	= shift;
 	my $subj	= shift;
 	my $pred	= shift;
-	my $iter	= $self->get_statements( $subj, $pred );
+	my $graph	= shift;
+	my $iter	= $self->get_statements( $subj, $pred, undef, $graph );
 	my %nodes;
 	while (my $st = $iter->next) {
 		my $obj	= $st->object;
@@ -564,6 +567,37 @@ sub bounded_description {
 		return $st;
 	};
 	return RDF::Trine::Iterator::Graph->new( $sub );
+}
+
+=item C<< as_string >>
+
+=cut
+
+sub as_string {
+	my $self	= shift;
+	my $iter	= $self->get_statements( undef, undef, undef, undef );
+	my @rows;
+	my @names	= qw[subject predicate object context];
+	while (my $row = $iter->next) {
+		push(@rows, [map {$row->$_()->as_string} @names]);
+	}
+	my @rule			= qw(- +);
+	my @headers			= (\q"| ");
+	push(@headers, map { $_ => \q" | " } @names);
+	pop	@headers;
+	push @headers => (\q" |");
+	my $table = Text::Table->new(@names);
+	$table->rule(@rule);
+	$table->body_rule(@rule);
+	$table->load(@rows);
+	my $size	= scalar(@rows);
+	return join('',
+			$table->rule(@rule),
+			$table->title,
+			$table->rule(@rule),
+			map({ $table->body($_) } 0 .. @rows),
+			$table->rule(@rule)
+		) . "$size statements\n";
 }
 
 sub _store {

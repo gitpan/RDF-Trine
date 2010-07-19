@@ -4,7 +4,7 @@ RDF::Trine::Store::Redland - Redland-backed RDF store for RDF::Trine
 
 =head1 VERSION
 
-This document describes RDF::Trine::Store::Redland version 0.124
+This document describes RDF::Trine::Store::Redland version 0.125_01
 
 =head1 SYNOPSIS
 
@@ -37,7 +37,7 @@ use RDF::Trine::Error;
 our $NIL_TAG;
 our $VERSION;
 BEGIN {
-	$VERSION	= "0.124";
+	$VERSION	= "0.125_01";
 	my $class	= __PACKAGE__;
 	$RDF::Trine::Store::STORE_CLASSES{ $class }	= $VERSION;
 	$NIL_TAG	= 'tag:gwilliams@cpan.org,2010-01-01:RT:NIL';
@@ -52,6 +52,38 @@ BEGIN {
 =item C<< new ( $store ) >>
 
 Returns a new storage object using the supplied RDF::Redland::Model object.
+
+=item C<new_with_config ( $hashref )>
+
+Returns a new storage object configured with a hashref with certain
+keys as arguments.
+
+The C<storetype> key must be C<Redland> for this backend.
+
+The following keys may also be used:
+
+=over
+
+=item C<store_name>
+
+The name of the storage factory (currently C<hashes>, C<mysql>,
+C<memory>, C<file>, C<postgresql>, C<sqlite>, C<tstore>, C<uri> or
+C<virtuoso>).
+
+=item C<name>
+
+The name of the storage.
+
+=item C<options>
+
+Any other options to be passed to L<RDF::Redland::Storage> as a hashref.
+
+=back
+
+=item C<new_with_object ( $redland_model )>
+
+Initialize the store with a L<RDF::Redland::Model> object.
+
 
 =cut
 
@@ -69,6 +101,18 @@ sub _new_with_string {
 	my $config	= shift;
 	my ($store_name, $name, $opts)	= split(/;/, $config, 3);
 	my $store	= RDF::Redland::Storage->new( $store_name, $name, $opts );
+	my $model	= RDF::Redland::Model->new( $store, '' );
+	return $class->new( $model );
+}
+
+sub _new_with_config {
+	my $class	= shift;
+	my $config	= shift;
+	my $store	= RDF::Redland::Storage->new(
+						     $config->{store_name},
+						     $config->{name},
+						     $config->{options}
+						    );
 	my $model	= RDF::Redland::Model->new( $store, '' );
 	return $class->new( $model );
 }
