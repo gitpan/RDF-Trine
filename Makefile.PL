@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-no warnings 'redefine';
 
 use inc::Module::Install;
 
@@ -46,6 +45,8 @@ resources(
 	'homepage'   => "http://search.cpan.org/dist/RDF-Trine/",
 	'repository' => "http://github.com/kasei/perlrdf/",
 );
+
+author_tests('xt');
 
 sign;
 
