@@ -44,7 +44,7 @@ requires:
   Text::CSV: 0
   Text::Table: 0
   Time::HiRes: 0
-  URI: 0
+  URI: 1.52
   Unicode::Escape: 0
   Unicode::String: 2.09
   XML::CommonNS: 0.04
@@ -55,4 +55,4 @@ resources:
   homepage: http://search.cpan.org/dist/RDF-Trine/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/kasei/perlrdf/
-version: 0.127
+version: 0.128_01
