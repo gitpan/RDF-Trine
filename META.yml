@@ -51,8 +51,9 @@ requires:
   XML::LibXML: 1.7
   XML::Namespace: 0
   XML::SAX: 0
+  perl: 5.8.3
 resources:
   homepage: http://search.cpan.org/dist/RDF-Trine/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/kasei/perlrdf/
-version: 0.128
+version: 0.129_01

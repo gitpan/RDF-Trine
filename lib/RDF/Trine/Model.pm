@@ -7,7 +7,7 @@ RDF::Trine::Model - Model class
 
 =head1 VERSION
 
-This document describes RDF::Trine::Model version 0.128
+This document describes RDF::Trine::Model version 0.129_01
 
 =head1 METHODS
 
@@ -23,7 +23,7 @@ no warnings 'redefine';
 
 our ($VERSION);
 BEGIN {
-	$VERSION	= '0.128';
+	$VERSION	= '0.129_01';
 }
 
 use Scalar::Util qw(blessed);
@@ -72,7 +72,7 @@ sub temporary_model {
 # 	my $store	= RDF::Trine::Store::DBI->temporary_store();
 	my $self	= $class->new( $store );
 	$self->{temporary}	= 1;
-	$self->{threshold}	= 2000;
+	$self->{threshold}	= 25_000;
 	return $self;
 }
 
@@ -136,11 +136,19 @@ sub add_statement {
 		if ($self->{added}++ >= $self->{threshold}) {
 # 			warn "*** should upgrade to a DBI store here";
 			my $store	= RDF::Trine::Store::DBI->temporary_store;
-			my $iter	= $self->get_statements();
+			my $iter	= $self->get_statements(undef, undef, undef, undef);
+			if ($store->can('_begin_bulk_ops')) {
+				$store->_begin_bulk_ops();
+			}
 			while (my $st = $iter->next) {
 				$store->add_statement( $st );
 			}
+			if ($store->can('_end_bulk_ops')) {
+				$store->_end_bulk_ops();
+			}
 			$self->{store}	= $store;
+			$self->{temporary}	= 0;
+# 			warn "*** upgraded to a DBI store";
 		}
 	}
 	return $self->_store->add_statement( @_ );
