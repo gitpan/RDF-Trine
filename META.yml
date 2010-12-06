@@ -7,7 +7,7 @@ build_requires:
   ExtUtils::MakeMaker: 6.42
   Test::Exception: 0
   Test::JSON: 0
-  Test::More: 0.61
+  Test::More: 0.88
 configure_requires:
   ExtUtils::MakeMaker: 6.42
 distribution_type: module
@@ -56,4 +56,4 @@ resources:
   homepage: http://search.cpan.org/dist/RDF-Trine/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/kasei/perlrdf/
-version: 0.130_02
+version: 0.130_03
