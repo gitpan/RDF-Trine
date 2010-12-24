@@ -38,6 +38,7 @@ requires:
   Log::Log4perl: 0
   Math::BigInt: 0
   Math::Combinatorics: 0.09
+  Module::Load::Conditional: 0
   Scalar::Util: 0
   Set::Scalar: 0
   Storable: 0
@@ -56,4 +57,4 @@ resources:
   homepage: http://search.cpan.org/dist/RDF-Trine/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/kasei/perlrdf/
-version: 0.131
+version: 0.131_01
