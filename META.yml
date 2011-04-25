@@ -28,7 +28,6 @@ requires:
   DBI: 0
   Data::UUID: 0
   Digest::MD5: 0
-  Digest::SHA1: 0
   Error: 0
   HTTP::Negotiate: 0
   JSON: 2
@@ -51,10 +50,10 @@ requires:
   XML::CommonNS: 0.04
   XML::LibXML: 1.7
   XML::Namespace: 0
-  XML::SAX: 0
+  XML::SAX: 0.96
   perl: 5.8.3
 resources:
   homepage: http://search.cpan.org/dist/RDF-Trine/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/kasei/perlrdf/
-version: 0.134
+version: 0.134_01
