@@ -68,6 +68,7 @@ lib/RDF/Trine/Store/DBI.pm
 lib/RDF/Trine/Store/DBI/mysql.pm
 lib/RDF/Trine/Store/DBI/Pg.pm
 lib/RDF/Trine/Store/DBI/SQLite.pm
+lib/RDF/Trine/Store/Dydra.pm
 lib/RDF/Trine/Store/Hexastore.pm
 lib/RDF/Trine/Store/Memory.pm
 lib/RDF/Trine/Store/Redland.pm
@@ -568,5 +569,6 @@ xt/data/turtle/test-15.ttl
 xt/data/turtle/test-16.out
 xt/data/turtle/test-16.ttl
 xt/parser-turtle.t
+xt/store-dydra.t
 xt/store-sparql.t
 extra/mysql.sql
