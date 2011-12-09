@@ -26,6 +26,7 @@ no_index:
 recommends:
   XML::LibXML: 1.7
 requires:
+  Algorithm::Combinatorics: 0
   DBD::SQLite: 1.14
   DBI: 0
   DBIx::Connector: 0
@@ -38,7 +39,6 @@ requires:
   List::Util: 0
   Log::Log4perl: 0
   Math::BigInt: 0
-  Math::Combinatorics: 0.09
   Module::Load::Conditional: 0.38
   Scalar::Util: 0
   Set::Scalar: 0
@@ -54,4 +54,4 @@ resources:
   homepage: http://search.cpan.org/dist/RDF-Trine/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/kasei/perlrdf/
-version: 0.136
+version: 0.136_01
