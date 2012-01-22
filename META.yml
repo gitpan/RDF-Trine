@@ -45,6 +45,7 @@ requires:
   Storable: 0
   Text::CSV: 0
   Text::Table: 0
+  Time::HiRes: 0
   URI: 1.52
   XML::CommonNS: 0.04
   XML::Namespace: 0
@@ -54,4 +55,4 @@ resources:
   homepage: http://search.cpan.org/dist/RDF-Trine/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/kasei/perlrdf/
-version: 0.137
+version: 0.137_01
