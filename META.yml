@@ -32,6 +32,7 @@ requires:
   DBIx::Connector: 0
   Data::UUID: 0
   Digest::MD5: 0
+  Digest::SHA: 0
   Error: 0
   HTTP::Negotiate: 0
   JSON: 2
@@ -55,4 +56,4 @@ resources:
   homepage: http://search.cpan.org/dist/RDF-Trine/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/kasei/perlrdf/
-version: 0.137_01
+version: 0.137_02
