@@ -4,7 +4,7 @@ RDF::Trine::Store::Redis - RDF Store for Redis
 
 =head1 VERSION
 
-This document describes RDF::Trine::Store::Redis version 0.138
+This document describes RDF::Trine::Store::Redis version 0.138_01
 
 =head1 SYNOPSIS
 
@@ -42,7 +42,7 @@ our $CACHING	= 1;
 my @pos_names;
 our $VERSION;
 BEGIN {
-	$VERSION	= "0.138";
+	$VERSION	= "0.138_01";
 	my $class	= __PACKAGE__;
 	$RDF::Trine::Store::STORE_CLASSES{ $class }	= $VERSION;
 	@pos_names	= qw(subject predicate object context);
@@ -140,9 +140,9 @@ sub _new_with_config {
 
 sub _config_meta {
 	return {
-		required_keys	=> [],
+		required_keys	=> [qw(server)],
 		fields			=> {
-			server		=> { description => 'server', type => 'string' },
+			server		=> { description => 'server:port', type => 'string' },
 			cache_size	=> { description => 'cache size', type => 'int' },
 		}
 	}
@@ -620,6 +620,10 @@ sub _dump {
 __END__
 
 =back
+
+=head1 REDIS DATA LAYOUT
+
+...
 
 =head1 BUGS
 

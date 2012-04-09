@@ -7,7 +7,7 @@ RDF::Trine::Serializer::NQuads - N-Quads Serializer
 
 =head1 VERSION
 
-This document describes RDF::Trine::Serializer::NQuads version 0.138
+This document describes RDF::Trine::Serializer::NQuads version 0.138_01
 
 =head1 SYNOPSIS
 
@@ -47,7 +47,7 @@ use RDF::Trine::Error qw(:try);
 
 our ($VERSION);
 BEGIN {
-	$VERSION	= '0.138';
+	$VERSION	= '0.138_01';
 	$RDF::Trine::Serializer::serializer_names{ 'nquads' }	= __PACKAGE__;
 	$RDF::Trine::Serializer::format_uris{ 'http://sw.deri.org/2008/07/n-quads/#n-quads' }	= __PACKAGE__;
 	foreach my $type (qw(text/x-nquads)) {
@@ -173,6 +173,20 @@ sub _statement_as_string {
 	return join(' ', map { $_->as_ntriples } @nodes) . " .\n";
 }
 
+
+=item C<< statement_as_string ( $st ) >>
+
+Returns a string with the supplied RDF::Trine::Statement::Quad object serialized
+as N-Quads, ending in a DOT and newline.
+
+=cut
+
+sub statement_as_string {
+	my $self	= shift;
+	my $st		= shift;
+	my @nodes	= $st->nodes;
+	return join(' ', map { $_->as_ntriples } @nodes[0..3]) . " .\n";
+}
 
 1;
 

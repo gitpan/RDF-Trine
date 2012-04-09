@@ -7,7 +7,7 @@ RDF::Trine - An RDF Framework for Perl
 
 =head1 VERSION
 
-This document describes RDF::Trine version 0.138
+This document describes RDF::Trine version 0.138_01
 
 =head1 SYNOPSIS
 
@@ -48,24 +48,28 @@ use Module::Load::Conditional qw[can_load];
 our ($debug, @ISA, $VERSION, @EXPORT_OK);
 BEGIN {
 	$debug		= 0;
-	$VERSION	= '0.138';
+	$VERSION	= '0.138_01';
 	
 	require Exporter;
 	@ISA		= qw(Exporter);
 	@EXPORT_OK	= qw(iri blank literal variable statement store UNION_GRAPH NIL_GRAPH);
 	
-	can_load( modules => {
-		'RDF::Redland'					=> undef,
-		'RDF::Trine::Store::Redland'	=> undef,
-		'RDF::Trine::Parser::Redland'	=> undef,
-	} );
+	unless ($ENV{RDFTRINE_NO_REDLAND}) {
+		can_load( modules => {
+			'RDF::Redland'					=> undef,
+			'RDF::Trine::Store::Redland'	=> undef,
+			'RDF::Trine::Parser::Redland'	=> undef,
+		} );
+	}
 }
 
 use constant UNION_GRAPH	=> 'tag:gwilliams@cpan.org,2010-01-01:RT:ALL';
 use constant NIL_GRAPH		=> 'tag:gwilliams@cpan.org,2010-01-01:RT:NIL';
 
 use Log::Log4perl qw(:easy);
-Log::Log4perl->easy_init($ERROR);
+if (! Log::Log4perl::initialized() ) {
+    Log::Log4perl->easy_init($ERROR);
+}
 
 use RDF::Trine::Graph;
 use RDF::Trine::Parser;

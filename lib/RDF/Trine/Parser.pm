@@ -7,7 +7,7 @@ RDF::Trine::Parser - RDF Parser class
 
 =head1 VERSION
 
-This document describes RDF::Trine::Parser version 0.138
+This document describes RDF::Trine::Parser version 0.138_01
 
 =head1 SYNOPSIS
 
@@ -53,7 +53,7 @@ our %format_uris;
 our %encodings;
 
 BEGIN {
-	$VERSION	= '0.138';
+	$VERSION	= '0.138_01';
 	can_load( modules => {
 		'Data::UUID'	=> undef,
 		'UUID::Tiny'	=> undef,
@@ -204,7 +204,7 @@ sub parse_url_into_model {
 		try {
 			$parser->parse_into_model( $url, $data, $model, %args );
 			$ok	= 1;
-		};
+		} catch RDF::Trine::Error with {};
 		return 1 if ($ok);
 	} else {
 		throw RDF::Trine::Error::ParserError -text => "No parser found for content type $type";
