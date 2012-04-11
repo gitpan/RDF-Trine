@@ -56,4 +56,4 @@ resources:
   homepage: http://search.cpan.org/dist/RDF-Trine/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/kasei/perlrdf/
-version: 0.138_01
+version: 0.139

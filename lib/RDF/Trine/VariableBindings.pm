@@ -7,7 +7,7 @@ RDF::Trine::VariableBindings - Variable bindings
 
 =head1 VERSION
 
-This document describes RDF::Trine::VariableBindings version 0.138_01
+This document describes RDF::Trine::VariableBindings version 0.139
 
 =head1 METHODS
 
@@ -29,7 +29,7 @@ use Scalar::Util qw(blessed refaddr);
 
 our ($VERSION);
 BEGIN {
-	$VERSION	= '0.138_01';
+	$VERSION	= '0.139';
 }
 
 ######################################################################
@@ -224,7 +224,7 @@ __END__
 
 =head1 COPYRIGHT
 
-Copyright (c) 2006-2010 Gregory Todd Williams. This
+Copyright (c) 2006-2012 Gregory Todd Williams. This
 program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
