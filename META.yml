@@ -53,7 +53,8 @@ requires:
   XML::SAX: 0.96
   perl: 5.8.3
 resources:
+  bugtracker: https://github.com/kasei/perlrdf/issues
   homepage: http://search.cpan.org/dist/RDF-Trine/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/kasei/perlrdf/
-version: 0.140
+version: 0.999_01
