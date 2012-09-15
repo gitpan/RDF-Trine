@@ -41,6 +41,8 @@ requires:
   Log::Log4perl: 0
   Math::BigInt: 0
   Module::Load::Conditional: 0.38
+  Moose: 2
+  MooseX::ArrayRef: 0
   Scalar::Util: 0
   Set::Scalar: 0
   Storable: 0
@@ -51,10 +53,10 @@ requires:
   XML::CommonNS: 0.04
   XML::Namespace: 0
   XML::SAX: 0.96
-  perl: 5.8.3
+  perl: 5.10.0
 resources:
   bugtracker: https://github.com/kasei/perlrdf/issues
   homepage: http://search.cpan.org/dist/RDF-Trine/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/kasei/perlrdf/
-version: 1.000
+version: 1.000_01
