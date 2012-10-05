@@ -14,11 +14,11 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 8de8e40aa09705e9c284edb2a7ed7041efece979 Changes.ttl
+SHA1 2b384b963bf3ee7205b8357ef9cfef0c9a75c4ff Changes.ttl
 SHA1 bdd3dcbc9812cb6e6ad71e59b60f2a1896397053 MANIFEST
-SHA1 eed7ef2c6280198808b1894fc21788bb5cf47ca2 META.yml
+SHA1 fed9d79904cc902d0c8fb83e988754c7a8292463 META.yml
 SHA1 77ee7a465b9f7c121d3748783d13010c4912cb37 Makefile.PL
-SHA1 2369b46cfd381d4899c71884ae04369ae8260bdf README
+SHA1 6a580751237b75d068835126efb2292c52f09c4d README
 SHA1 6b887e866f74e6f823724001c49146ee906c558a bin/graph.pl
 SHA1 6b250506c12423fc465c493af38c65ef5b310274 bin/rdf_init_store.pl
 SHA1 035139b8613eb6d53bbf8b0987233b0a4148911e bin/rdf_parse_turtle.pl
@@ -41,66 +41,66 @@ SHA1 29044991152cb220fcd2a5ccc3512139d2f5f577 inc/Module/Install/Metadata.pm
 SHA1 d5cd64445b98ff377f7bb3ad750c01b509622e28 inc/Module/Install/Scripts.pm
 SHA1 896bba60ebe29b3b60fce8414f923fec97bf53e1 inc/Module/Install/Win32.pm
 SHA1 e5c82926a05f844765964b013b31c48eefbb208c inc/Module/Install/WriteAll.pm
-SHA1 f2b8339af038d5aba91354560c56616948f4ca85 lib/RDF/Trine.pm
-SHA1 a700898e4267d5cb078bfd5ae4b1ab60eefeacf7 lib/RDF/Trine/Error.pm
-SHA1 58a40bffd7ea8c88f22074f9e131f8a0cc1be057 lib/RDF/Trine/Exporter/CSV.pm
-SHA1 93fd9458138c16236e456349b7f37f775bf2fbcf lib/RDF/Trine/Graph.pm
-SHA1 71abd79bacc144a09407aa057ff1f6dc44997292 lib/RDF/Trine/Iterator.pm
-SHA1 40f3a0bad90b4fece3fc04de67ed82ef8503987b lib/RDF/Trine/Iterator/Bindings.pm
-SHA1 6015cc30e0f20d58d7d11154a9720e679e8852cc lib/RDF/Trine/Iterator/Bindings/Materialized.pm
-SHA1 1ef8db781262c4e94fe8d8ab01da4ea63e1969a9 lib/RDF/Trine/Iterator/Boolean.pm
-SHA1 fd1537f0f01102a1b21d1ad739f5f7a3e2653f1c lib/RDF/Trine/Iterator/Graph.pm
-SHA1 1c33bfc65c25d9b6e8ed1feec09239d072e7ffc6 lib/RDF/Trine/Iterator/Graph/Materialized.pm
-SHA1 c7e443ee64dfff21043f81fd09e015337995a4ee lib/RDF/Trine/Iterator/JSONHandler.pm
-SHA1 288d492e04c27d9f8c342a2cbfcbdab7b77113e7 lib/RDF/Trine/Iterator/SAXHandler.pm
-SHA1 5bf8a937f9c8cbba4a581a51a06718ab824bfb04 lib/RDF/Trine/Model.pm
-SHA1 4176e1493cfb82a9f6d2f2bc677e209e3cd926e5 lib/RDF/Trine/Model/Dataset.pm
-SHA1 e9bab3c77e982a39011b5a57c40c57ab130c8145 lib/RDF/Trine/Model/StatementFilter.pm
-SHA1 35d0d396aac609b570f889583759954f12c180f3 lib/RDF/Trine/Model/Union.pm
-SHA1 2981d52ac21534d4c5f6fe321c439c95ccf8b33e lib/RDF/Trine/Namespace.pm
-SHA1 d5c256c8448804fa7b3c7b1bac3fa6d21f0d06ba lib/RDF/Trine/NamespaceMap.pm
-SHA1 d514bf094a2073b36e9f05984c0ef8b32cdb22c6 lib/RDF/Trine/Node.pm
-SHA1 6f71325fc8f75d368235f111d31af6150beff879 lib/RDF/Trine/Node/Blank.pm
-SHA1 cf8d44e6a133ddc36368238331079ab580c722a1 lib/RDF/Trine/Node/Literal.pm
-SHA1 0840461e162c182d209137895dfabe977d723912 lib/RDF/Trine/Node/Nil.pm
-SHA1 9c0946532e776b3176f8d1c98a03cb53aff3a81a lib/RDF/Trine/Node/Resource.pm
-SHA1 846d90a6589d1e43224443bbd0c68a218a8f9dac lib/RDF/Trine/Node/Variable.pm
-SHA1 b7e15ba88ecb1610da47d59dbf059d66961ba3a1 lib/RDF/Trine/Parser.pm
-SHA1 6a241bf2a131563f0932dce40c8d1ef0825b56fa lib/RDF/Trine/Parser/NQuads.pm
-SHA1 471f82af63e30766d354cdc4c1dd79aa6803e006 lib/RDF/Trine/Parser/NTriples.pm
-SHA1 c5efdfe53db9095bfdb3c90f593446a088dc52f9 lib/RDF/Trine/Parser/RDFJSON.pm
-SHA1 3b9b9b0c77d39c2fcd8745330bb60ee8e5790d70 lib/RDF/Trine/Parser/RDFXML.pm
-SHA1 13296277b6f48c5cb4a16e7a62ae52f2771c1c01 lib/RDF/Trine/Parser/RDFa.pm
-SHA1 e2f124568187169645fab4d8e2eb3a7e2da4c994 lib/RDF/Trine/Parser/Redland.pm
-SHA1 01f780e8eb30a55238c87a92e958e3ef219ca628 lib/RDF/Trine/Parser/TriG.pm
-SHA1 934d81ab9e003260f31a833d260b662ba04292d5 lib/RDF/Trine/Parser/Turtle.pm
-SHA1 44c3bff7a2b22fb205594ee7d7cff76fb4bab502 lib/RDF/Trine/Parser/Turtle/Constants.pm
-SHA1 9371aa4fc0cd32af1b48c1806a99cf5e6821dae8 lib/RDF/Trine/Parser/Turtle/Lexer.pm
+SHA1 4440a26138201a94d1132e39413daef21e63835d lib/RDF/Trine.pm
+SHA1 c49535558205bd0a46b98019209d563fda767277 lib/RDF/Trine/Error.pm
+SHA1 a4757ce5b9d883d768f104355f3e187b58e9ef8a lib/RDF/Trine/Exporter/CSV.pm
+SHA1 cd423161e0aac0d77c908c30fa62ef351e060274 lib/RDF/Trine/Graph.pm
+SHA1 6f9341a1158b62306f2b19ea70759c73475a3f1d lib/RDF/Trine/Iterator.pm
+SHA1 e7889bbb3ae55f84505996f5b3751ba3c69b5c3f lib/RDF/Trine/Iterator/Bindings.pm
+SHA1 20044b09d8303755de98b86a892b462d6789ff6c lib/RDF/Trine/Iterator/Bindings/Materialized.pm
+SHA1 356bcddeda2a21968c03828a3135fd37a4c50444 lib/RDF/Trine/Iterator/Boolean.pm
+SHA1 c50e2148c9ce7a9548971d0134b654113cdbb124 lib/RDF/Trine/Iterator/Graph.pm
+SHA1 405125251a3d6d7dfe8e381e8ee5139e804b17e2 lib/RDF/Trine/Iterator/Graph/Materialized.pm
+SHA1 005f289e6b7ad086e036dba3dc7b0e8d9a520aeb lib/RDF/Trine/Iterator/JSONHandler.pm
+SHA1 b7e2a1ec8d5305ee140b2579c21f5590aed5bcbb lib/RDF/Trine/Iterator/SAXHandler.pm
+SHA1 9cc4c8a2f99025bf0c5613f6764722bf2c7fe8c0 lib/RDF/Trine/Model.pm
+SHA1 bb0fc6e3b2e69b68c674d048da08499d570be208 lib/RDF/Trine/Model/Dataset.pm
+SHA1 7e7ca7043621b5113f7b5adac0f893beb77046d9 lib/RDF/Trine/Model/StatementFilter.pm
+SHA1 afc97d86dd58b70ecde986165ca6d4c0d3ef2ac9 lib/RDF/Trine/Model/Union.pm
+SHA1 ce30f4c9137e8404873aa20b046c1f29d571eeda lib/RDF/Trine/Namespace.pm
+SHA1 6c63d74a85c14c2281cef98ae8d36e852db7244d lib/RDF/Trine/NamespaceMap.pm
+SHA1 3797f0de196522f73585d489a6a7c0ede861771c lib/RDF/Trine/Node.pm
+SHA1 e99743779eb300fa0d7c0f180fc1deda322d911f lib/RDF/Trine/Node/Blank.pm
+SHA1 9c1b811a4891b93cd40b1adf4d3256ead8571f52 lib/RDF/Trine/Node/Literal.pm
+SHA1 1c2b6ac919343f7e962f7eac4f6926d37b77af6b lib/RDF/Trine/Node/Nil.pm
+SHA1 0268b8a0f16241a9e076f486de624f89b98a31a7 lib/RDF/Trine/Node/Resource.pm
+SHA1 86276eab8de0d391bc4d2d9af01543ce80adea2e lib/RDF/Trine/Node/Variable.pm
+SHA1 fdded42114c1ed1c016cf1a249ff2a186f8aa04c lib/RDF/Trine/Parser.pm
+SHA1 9f046f570573928b18d751ffe4e5cd59ba5f8b8d lib/RDF/Trine/Parser/NQuads.pm
+SHA1 02b94e9c6379bc57324b65fc651964374250a242 lib/RDF/Trine/Parser/NTriples.pm
+SHA1 033f0cd30cc4c0f411045dbc79c10f2bcb6647af lib/RDF/Trine/Parser/RDFJSON.pm
+SHA1 088f940f6fdf36a6238bc746a794f3a5c3c31986 lib/RDF/Trine/Parser/RDFXML.pm
+SHA1 7762197f77397b3d1a566d65d4321aa6a5a359a4 lib/RDF/Trine/Parser/RDFa.pm
+SHA1 5648a36c7fcd47a225ca954e2d4c87d6e86fe8ee lib/RDF/Trine/Parser/Redland.pm
+SHA1 bf3e0dae54cc44e15c95a971f9a0a046f3428df0 lib/RDF/Trine/Parser/TriG.pm
+SHA1 d9a5439cfdb72a401732288534ec40c67507ec78 lib/RDF/Trine/Parser/Turtle.pm
+SHA1 3de6ba40d9200a80df81bb1cb4ad1ebec2294829 lib/RDF/Trine/Parser/Turtle/Constants.pm
+SHA1 522d6de28b4344dce3322b613497e7ef0a55d337 lib/RDF/Trine/Parser/Turtle/Lexer.pm
 SHA1 c210d2369f1be2469fb59ec14dc2749de1e88ff3 lib/RDF/Trine/Parser/Turtle/Token.pm
-SHA1 a365e59aba083f9704ac4350cb40ca4ac7224216 lib/RDF/Trine/Pattern.pm
-SHA1 f2e3c573311660b0d653ace6eb9e0cb9a192cb12 lib/RDF/Trine/Serializer.pm
-SHA1 0a779ea462288385a32fbc962910249a16be2253 lib/RDF/Trine/Serializer/NQuads.pm
-SHA1 9a33f6ac7c485c0f49ceedd8a58fa70463953e96 lib/RDF/Trine/Serializer/NTriples.pm
-SHA1 f22f0ed955f1723122d46edd91a3238a9aababf5 lib/RDF/Trine/Serializer/NTriples/Canonical.pm
-SHA1 0fbaa02ab6dc4b2ab34204b2809880198b35678a lib/RDF/Trine/Serializer/RDFJSON.pm
-SHA1 66994f7f6757407b5d469d60cdfecf3766c127c6 lib/RDF/Trine/Serializer/RDFXML.pm
-SHA1 e44c6bb1ef8ee9a8aae5098970bcb1f3948dd262 lib/RDF/Trine/Serializer/TSV.pm
-SHA1 04d5c7b720b1b006993c34a91e74f5336c283829 lib/RDF/Trine/Serializer/Turtle.pm
-SHA1 38dd882f35fc170f82de69caaec1be5c67dc10c6 lib/RDF/Trine/Statement.pm
-SHA1 a2c2e7f74d56346bf4714c43fdd4d7da113cd91e lib/RDF/Trine/Statement/Quad.pm
-SHA1 bc75e820cc71fdff11c1763a6946c9fccc4458d0 lib/RDF/Trine/Store.pm
-SHA1 7273d28884c36fefa5d05553cad8d507cb63ee95 lib/RDF/Trine/Store/DBI.pm
-SHA1 84baf8725e0f3a3e6c3085c8e9575965ba74ce21 lib/RDF/Trine/Store/DBI/Pg.pm
-SHA1 561bdca914763b04e5e1850b277f1ef32747eac4 lib/RDF/Trine/Store/DBI/SQLite.pm
-SHA1 41ee05d65f998afbab75412100a54f7f246412f0 lib/RDF/Trine/Store/DBI/mysql.pm
-SHA1 414cb25a2a7fdc4f9c59ebcb3c1255ea4e644ea3 lib/RDF/Trine/Store/Dydra.pm
-SHA1 73270bc1dab0c58f5bb1671e690fde2deab3d41d lib/RDF/Trine/Store/Hexastore.pm
-SHA1 0a8cd7efecad6bff40383d15c873c1bd13c08a98 lib/RDF/Trine/Store/Memory.pm
-SHA1 9f65b51dc712db0247bec6530e0e91cffc26d1a9 lib/RDF/Trine/Store/Redis.pm
-SHA1 67158ac7161ddfd028a4875ca89ff5889adb4b0f lib/RDF/Trine/Store/Redland.pm
-SHA1 f76e9723b499f5ae25fe0fc73d99ba6d6c848313 lib/RDF/Trine/Store/SPARQL.pm
-SHA1 7832a2bf651d37a10005dd4fa37d80715571f044 lib/RDF/Trine/VariableBindings.pm
-SHA1 5d4064efc3146171b5bda12b78a48d977e91d9a9 lib/Test/RDF/Trine/Store.pm
+SHA1 907673e5fd24d8912ad33ac5df2375aa9f15146d lib/RDF/Trine/Pattern.pm
+SHA1 8d048faa7b935b6161a97795fee551f3b2a3f239 lib/RDF/Trine/Serializer.pm
+SHA1 820c988e0b5c8856f4c6f1afbea15143a16ce44c lib/RDF/Trine/Serializer/NQuads.pm
+SHA1 3752ed9e98acc4eafb013dd6a3e44dc05bf652ea lib/RDF/Trine/Serializer/NTriples.pm
+SHA1 41f44754173a348751e25a34e47079677feca21a lib/RDF/Trine/Serializer/NTriples/Canonical.pm
+SHA1 e14aff808ff7503e667d8ffa44d9c1266ab3fd28 lib/RDF/Trine/Serializer/RDFJSON.pm
+SHA1 931401bd5360d3c6f204a4a98d5e45292ca08af2 lib/RDF/Trine/Serializer/RDFXML.pm
+SHA1 a2cb4372eef3b0de233fd9e829c75ee3e952b0af lib/RDF/Trine/Serializer/TSV.pm
+SHA1 104ae8bc554161dbe8809e89f7aa76995badb762 lib/RDF/Trine/Serializer/Turtle.pm
+SHA1 b50f60814bd6cd8ef4fbf17e1c88d0807fbcdc6c lib/RDF/Trine/Statement.pm
+SHA1 a4ebeecde27f8bc52ae7985cb5aa362dcc1479d9 lib/RDF/Trine/Statement/Quad.pm
+SHA1 fcd4d0bab613bb60279286d14bfa53f6507d705e lib/RDF/Trine/Store.pm
+SHA1 89cde0b82740626f03e2eb751ec26d4ec8c68655 lib/RDF/Trine/Store/DBI.pm
+SHA1 867273b2438685ad271a026cbf18d8b3fa17cee0 lib/RDF/Trine/Store/DBI/Pg.pm
+SHA1 25dfe8dd09d59659eeef498db36455f81e77f3a6 lib/RDF/Trine/Store/DBI/SQLite.pm
+SHA1 b684ed140adcbd51f64469961e3a617f709c417e lib/RDF/Trine/Store/DBI/mysql.pm
+SHA1 3f56cc4b54bccba3ac341d605fce9029776bf98a lib/RDF/Trine/Store/Dydra.pm
+SHA1 462e3c861d37909195b241ca8a8c67048224a489 lib/RDF/Trine/Store/Hexastore.pm
+SHA1 9ce8ef43259dddefe9818bb30711878f8b067b8f lib/RDF/Trine/Store/Memory.pm
+SHA1 366dacb2a49ffd9ba2ca739d76829dbb809a696e lib/RDF/Trine/Store/Redis.pm
+SHA1 c9fac70b5fcaf0f77a80c08868b4a90288190d45 lib/RDF/Trine/Store/Redland.pm
+SHA1 31dbe610456a8339e45ed25200db661b14786b3a lib/RDF/Trine/Store/SPARQL.pm
+SHA1 9c7bf0113782b614495b72712f07ba28655e601e lib/RDF/Trine/VariableBindings.pm
+SHA1 0b6bb6dcc9e1613a2c0c469bb7331fb1a31a671b lib/Test/RDF/Trine/Store.pm
 SHA1 3d6f8b1b1edbb40c4bae20dfc977fcf67d97ff28 t/00.load.t
 SHA1 403973466abf1be3a25ac53e0e4eeaee06e1a669 t/data/bugs/ttl-with-bom.ttl
 SHA1 171b51b6ee76df5df278cd9b8946edbc2dade2b4 t/data/rdfa/test-sd.nt
@@ -600,7 +600,7 @@ SHA1 0d59038cf8ba6efd00638de2bcf3c56bbd3e7da1 xt/store-sparql.t
 Version: GnuPG v1.4.10 (Darwin)
 Comment: GPGTools - http://gpgtools.org
 
-iEYEARECAAYFAlBsl7EACgkQhPK6VMqoyC1jNQCeNd55MyAbyuZVzlULi9aEpXaM
-foAAnjzdXweGS9oR8mgtQ6Bc8iPp1Z7R
-=49OW
+iEYEARECAAYFAlBvQjcACgkQhPK6VMqoyC01mgCfe0HbLC5eevaUZJlUviudBY9w
+BvkAnRXIw98Devyzx+MnyATkV4nqgKVr
+=N9vp
 -----END PGP SIGNATURE-----
