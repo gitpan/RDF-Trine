@@ -44,7 +44,7 @@ requires:
   Module::Load::Conditional: 0.38
   Moose: 2
   MooseX::ArrayRef: 0
-  Scalar::Util: 1.23
+  Scalar::Util: 1.24
   Set::Scalar: 0
   Storable: 0
   Text::CSV: 0
@@ -60,4 +60,4 @@ resources:
   homepage: http://search.cpan.org/dist/RDF-Trine/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/kasei/perlrdf/
-version: 1.002
+version: 1.002_01
