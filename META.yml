@@ -4,14 +4,15 @@ author:
   - 'Gregory Todd Williams  C<< <gwilliams@cpan.org> >>'
   - 'Gregory Todd Williams <gwilliams@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
+  ExtUtils::MakeMaker: 6.59
   Test::Exception: 0
   Test::JSON: 0
   Test::More: 0.88
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
+  ExtUtils::MakeMaker: 6.59
 distribution_type: module
-generated_by: 'Module::Install version 0.99'
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -50,6 +51,7 @@ requires:
   Text::CSV: 0
   Text::Table: 0
   Time::HiRes: 0
+  TryCatch: 0
   URI: 1.52
   XML::CommonNS: 0.04
   XML::Namespace: 0
@@ -60,4 +62,4 @@ resources:
   homepage: http://search.cpan.org/dist/RDF-Trine/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/kasei/perlrdf/
-version: 1.004
+version: 1.004_01
