@@ -8,6 +8,7 @@ build_requires:
   Test::Exception: 0
   Test::JSON: 0
   Test::More: 0.88
+  TryCatch: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
@@ -51,7 +52,6 @@ requires:
   Text::CSV: 0
   Text::Table: 0
   Time::HiRes: 0
-  TryCatch: 0
   URI: 1.52
   XML::CommonNS: 0.04
   XML::Namespace: 0
@@ -62,4 +62,4 @@ resources:
   homepage: http://search.cpan.org/dist/RDF-Trine/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/kasei/perlrdf/
-version: 1.005
+version: 1.005_01
